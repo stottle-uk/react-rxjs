@@ -10,26 +10,39 @@ class App extends Component<any, any> {
   componentDidMount(): void {
     window.onpopstate = event => {
       this.setState({
-        location: (window.location.pathname + window.location.search).substring(1)
+        location: (window.location.pathname + window.location.search).substring(
+          1
+        )
       });
     };
   }
 
   changeUrl = (e: any): void => {
-    const rnd = `someUrl${Math.random()}`;
-    history.pushState({}, window.document.title, rnd);
-    this.setState({
-      location: rnd
-    });
+    console.log(e.currentTarget.pathname.substring(1));
+
+    e.preventDefault();
+    const location = e.currentTarget.pathname.substring(1);
+    this.pushState(location);
   };
 
   render() {
     return (
       <div className="App">
-        <a onClick={this.changeUrl}>ClickMe</a>
-        <WatchMe interval={1000} location={this.state.location} />
+        <a href="home" onClick={this.changeUrl}>
+          Home
+        </a>
+        -
+        <a href="other" onClick={this.changeUrl}>
+          Other
+        </a>
+        <WatchMe defaultPage={'home'} location={this.state.location} />
       </div>
     );
+  }
+
+  private pushState(location: string) {
+    history.pushState({}, window.document.title, location);
+    this.setState({ location });
   }
 }
 

@@ -1,45 +1,45 @@
 import React, { Component } from 'react';
-import { ReplaySubject, Subject } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import { map, mergeMap, tap } from 'rxjs/operators';
-import WatchMeView from './WatchMeView';
+import { Observable, of, Subject } from 'rxjs';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import HomePage from './HomePage';
+import * as testData from './homePageData';
+import OtherPage from './OtherPage';
+import { PageEntry } from './Testdata';
 
 interface WatchMeProps {
-  interval: number;
+  defaultPage: string;
   location: string;
 }
 
 interface WatchMeState {
-  data: any;
-}
-
-function ATest(): any {
-  return <div>ftikkj</div>;
+  data: PageEntry;
+  template: React.ComponentType<PageEntry>;
 }
 
 class WatchMe extends Component<WatchMeProps, WatchMeState> {
   destory$ = new Subject();
-  location$ = new ReplaySubject<string>();
+  location$ = new Subject<string>();
 
   componentDidMount(): void {
-    this.location$.next(this.props.location);
     this.location$
       .pipe(
-        mergeMap((data, i) =>
-          ajax('https://randomuser.me/api/?results=5').pipe(
-            map(response => response.response.results),
-            tap(results =>
-              this.setState({
-                data: results
-              })
-            )
+        takeUntil(this.destory$),
+        switchMap(location =>
+          this.getPageEntryData(location).pipe(
+            map(pageEntryData => ({
+              data: pageEntryData,
+              template: this.getTemplate(location)
+            })),
+            tap(state => this.setState(state))
           )
         )
       )
       .subscribe();
+
+    this.location$.next(this.props.location);
   }
 
-  componentDidUpdate(prevProps: Readonly<WatchMeProps>, prevState: Readonly<WatchMeState>): void {
+  componentDidUpdate(prevProps: Readonly<WatchMeProps>): void {
     if (prevProps.location !== this.props.location) {
       this.location$.next(this.props.location);
     }
@@ -52,13 +52,47 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
 
   render() {
     return this.state ? (
-      <div>
-        <WatchMeView item={this.state.data} render={data => <ATest />} />
-      </div>
+      <this.state.template {...this.state.data} />
     ) : (
       <div>waiting</div>
     );
   }
+
+  private getTemplate(location: string): React.ComponentType<PageEntry> {
+    if (!location) {
+      return templateData[this.props.defaultPage];
+    }
+
+    const data = templateData[location];
+    if (data) {
+      return data;
+    }
+
+    return templateData.home;
+  }
+
+  private getPageEntryData(location: string): Observable<PageEntry> {
+    if (!location) {
+      return of(routeData[this.props.defaultPage]);
+    }
+
+    const data = routeData[location];
+    if (data) {
+      return of(data);
+    }
+
+    return of();
+  }
 }
 
 export default WatchMe;
+
+const routeData: { [hey: string]: PageEntry } = {
+  home: testData.homePageData,
+  other: testData.otherPageData
+};
+
+const templateData: { [hey: string]: React.ComponentType<PageEntry> } = {
+  home: HomePage,
+  other: OtherPage
+};

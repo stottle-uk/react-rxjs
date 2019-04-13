@@ -1,5 +1,16 @@
-import React from 'react';
-import { PageEntry } from './Testdata';
+import React, { ComponentType } from 'react';
+import P2PageEntry from './templateEntries/P2TemplateEntry';
+import { Entry, PageEntry } from './Testdata';
+
+class NotFound extends React.Component<Entry, any> {
+  render() {
+    return this.props ? (
+      <div>{this.props.template} not defined</div>
+    ) : (
+      <div>fack!</div>
+    );
+  }
+}
 
 class OtherPage extends React.Component<PageEntry, any> {
   componentDidUpdate(
@@ -10,8 +21,31 @@ class OtherPage extends React.Component<PageEntry, any> {
   }
 
   render() {
-    return <pre>OtherPage {JSON.stringify(this.props, null, 2)}</pre>;
+    return (
+      <div>
+        <h1>Other Page</h1>
+        {this.renderEntries(this.props.entries)}
+        {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
+      </div>
+    );
+  }
+
+  private renderEntries(entries: Entry[]): JSX.Element[] {
+    return entries.map(entry => {
+      const Template = pageEntries[entry.template]
+        ? pageEntries[entry.template]
+        : NotFound;
+      return (
+        <div key={entry.id}>
+          <Template {...entry} />
+        </div>
+      );
+    });
   }
 }
 
 export default OtherPage;
+
+const pageEntries: { [hey: string]: ComponentType<any> } = {
+  P2: P2PageEntry
+};

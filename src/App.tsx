@@ -1,48 +1,60 @@
 import React, { Component } from 'react';
+import { of } from 'rxjs';
 import './App.css';
+import { AppRouter } from './featureName/AppRouter';
+import HomePage from './featureName/HomePage';
+import * as testData from './featureName/homePageData';
+import OtherPage from './featureName/OtherPage';
+import { getHomePageData } from './featureName/pageData/getHomePageData';
+import { PageEntry } from './featureName/Testdata';
 import WatchMe from './featureName/WatchMe';
 
 class App extends Component<any, any> {
-  state = {
-    location: (window.location.pathname + window.location.search).substring(1)
-  };
-
-  componentDidMount(): void {
-    window.onpopstate = event => {
-      this.setState({
-        location: (window.location.pathname + window.location.search).substring(
-          1
-        )
-      });
-    };
-  }
+  private router = new AppRouter<PageEntry>({
+    defaultRoute: '',
+    routes: [
+      {
+        name: 'Home',
+        path: '/',
+        template: HomePage,
+        data: () => getHomePageData()
+      },
+      {
+        name: 'Home',
+        path: '/home',
+        template: HomePage,
+        data: () => of(testData.homePageData)
+      },
+      {
+        name: 'Other',
+        path: '/other',
+        template: OtherPage,
+        data: () => of(testData.otherPageData)
+      }
+    ]
+  });
 
   changeUrl = (e: any): void => {
-    console.log(e.currentTarget.pathname.substring(1));
+    console.log(e.currentTarget.pathname);
 
     e.preventDefault();
-    const location = e.currentTarget.pathname.substring(1);
-    this.pushState(location);
+    const location = e.currentTarget.pathname;
+    this.router.go(location);
   };
 
   render() {
     return (
       <div className="App">
-        <a href="home" onClick={this.changeUrl}>
+        <a href="/" onClick={this.changeUrl}>
           Home
         </a>
         -
         <a href="other" onClick={this.changeUrl}>
           Other
         </a>
-        <WatchMe defaultPage={'home'} location={this.state.location} />
+        <WatchMe router={this.router} />
       </div>
     );
-  }
-
-  private pushState(location: string) {
-    history.pushState({}, window.document.title, location);
-    this.setState({ location });
   }
 }
 

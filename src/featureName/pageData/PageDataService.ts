@@ -1,27 +1,42 @@
-import { from, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { PageEntry } from '../Testdata';
+import { List, PageEntry } from '../Testdata';
 
-export function getHomePageData(): Observable<PageEntry> {
-  return ajax(pageUrl).pipe(
-    map(response => response.response as PageEntry),
-    switchMap(pageEntry =>
-      from(listsUrls).pipe(
-        mergeMap(listUrl =>
-          ajax(listUrl).pipe(
-            map(map => map.response as any[]),
-            map(lists => ({
-              ...pageEntry,
-              entries: mapEntries(pageEntry, lists)
-            }))
-          )
+export class PageDataService {
+  private innerPages = new BehaviorSubject<PageEntry[]>([]);
+  private innerLists = new BehaviorSubject<List[]>([]);
+
+  get pages(): Observable<PageEntry[]> {
+    return this.innerPages.asObservable();
+  }
+
+  get lisss(): Observable<List[]> {
+    return this.innerLists.asObservable();
+  }
+
+  getHomePageData(): Observable<PageEntry> {
+    return ajax(pageUrl).pipe(
+      map(response => response.response as PageEntry),
+      switchMap(pageEntry => this.getLists(pageEntry))
+    );
+  }
+
+  private getLists(pageEntry: PageEntry): Observable<PageEntry> {
+    return from(listsUrls).pipe(
+      mergeMap(listUrl =>
+        ajax(listUrl).pipe(
+          map(map => map.response as List[]),
+          map(lists => ({
+            ...pageEntry,
+            entries: this.mapEntries(pageEntry, lists)
+          }))
         )
       )
-    )
-  );
+    );
+  }
 
-  function mapEntries(pageEntry: PageEntry, lists: any[]) {
+  mapEntries(pageEntry: PageEntry, lists: List[]) {
     return pageEntry.entries.map(e => {
       const list = lists.find(l => e.list.id === l.id);
       if (list) {

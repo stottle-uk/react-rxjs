@@ -1,7 +1,5 @@
-import { of } from 'rxjs';
 import { AppRouter } from './featureName/AppRouter';
 import HomePage from './featureName/HomePage';
-import * as testData from './featureName/homePageData';
 import OtherPage from './featureName/OtherPage';
 import { PageDataService } from './featureName/pageData/PageDataService';
 import { PageEntry } from './featureName/Testdata';
@@ -14,19 +12,19 @@ export const router = new AppRouter<PageEntry>({
       name: 'Home',
       path: '/',
       template: HomePage,
-      data: () => dataService.getHomePageData()
+      data: path => dataService.getHomePageData(path)
     },
     {
       name: 'Home',
       path: '/home',
       template: HomePage,
-      data: () => of(testData.homePageData)
+      data: path => dataService.getHomePageData(path)
     },
     {
-      name: 'Other',
-      path: '/other',
+      name: 'lancamentos-de-filmes',
+      path: '/lancamentos-de-filmes',
       template: OtherPage,
-      data: () => of(testData.otherPageData)
+      data: path => dataService.getHomePageData(path)
     }
   ]
 });

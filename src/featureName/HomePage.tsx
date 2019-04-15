@@ -23,8 +23,8 @@ class HomePage extends React.Component<PageEntry, any> {
   render() {
     return (
       <div>
-        <h1>Home Page</h1>
-        {this.renderEntries(this.props.entries)}
+        <h1>{this.props.title}</h1>
+        {this.props.entries && this.renderEntries(this.props.entries)}
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );

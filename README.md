@@ -1,3 +1,9 @@
+# Run
+
+`open -a Google\ Chrome --args --disable-web-security --user-data-dir`
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

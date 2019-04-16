@@ -13,6 +13,10 @@ class NotFound extends React.Component<Entry, any> {
 }
 
 class OtherPage extends React.Component<PageEntry, any> {
+  componentDidMount(): void {
+    console.log(this.props);
+  }
+
   componentDidUpdate(
     prevProps: Readonly<PageEntry>,
     prevState: Readonly<any>
@@ -23,9 +27,9 @@ class OtherPage extends React.Component<PageEntry, any> {
   render() {
     return (
       <div>
-        <h1>Other Page</h1>
-        {this.renderEntries(this.props.entries)}
-        {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
+        <h1>{this.props.title}</h1>
+        {this.props.entries && this.renderEntries(this.props.entries)}
+        <pre>{JSON.stringify(this.props, null, 2)}</pre>
       </div>
     );
   }

@@ -1,98 +1,87 @@
-import {
-  BehaviorSubject,
-  combineLatest,
-  from,
-  iif,
-  Observable,
-  of
-} from 'rxjs';
+import { combineLatest, from, iif, Observable, of, ReplaySubject } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import {
   bufferTime,
+  distinctUntilChanged,
   filter,
   map,
   mergeMap,
+  scan,
+  startWith,
   switchMap,
-  take,
   tap
 } from 'rxjs/operators';
-import { List, PageEntry } from '../Testdata';
+import { Entry, List, PageEntry } from '../Testdata';
+
+export interface Dictionary<T> {
+  [key: string]: T;
+}
 
 export class PageDataService {
-  private innerPages$ = new BehaviorSubject<PageEntry[]>([]);
-  private innerLists$ = new BehaviorSubject<List[]>([]);
-  private innerCurrentPath$ = new BehaviorSubject<string>('');
+  private innerPage$ = new ReplaySubject<PageEntry>();
 
-  get pages$(): Observable<PageEntry[]> {
-    return this.innerPages$.asObservable();
+  get pages$(): Observable<Dictionary<PageEntry>> {
+    return this.innerPage$.pipe(
+      map(page => ({
+        [page.path]: page
+      })),
+      scan(
+        (acc, curr) => ({
+          ...acc,
+          ...curr
+        }),
+        {} as Dictionary<PageEntry>
+      )
+    );
   }
 
-  get lists$(): Observable<List[]> {
-    return this.innerLists$.asObservable();
-  }
-
-  get currentPath$(): Observable<string> {
-    return this.innerCurrentPath$.asObservable().pipe(filter(path => !!path));
-  }
-
-  get currentPage$(): Observable<PageEntry> {
-    return combineLatest(this.currentPath$, this.pages$).pipe(
-      map(([path, pages]) => pages.find(p => p.path === path) as PageEntry),
-      filter(page => !!page)
+  get lists$(): Observable<Dictionary<List>> {
+    return this.innerPage$.pipe(
+      switchMap(page =>
+        this.queueGetList(page).pipe(
+          mergeMap(listIds =>
+            iif(() => !!listIds.length, this.getListsAcc(listIds), of())
+          ),
+          mergeMap(lists => from(lists)),
+          map(list => ({
+            [list.id]: list
+          })),
+          scan(
+            (acc, curr) => ({
+              ...acc,
+              ...curr
+            }),
+            {} as Dictionary<List>
+          )
+        )
+      )
     );
   }
 
   getHomePageData(path: string): Observable<PageEntry> {
-    this.innerCurrentPath$.next(path);
+    const pageEntry$ = this.getPageEntry(path).pipe(
+      tap(page => this.innerPage$.next(page))
+    );
+    const lists$ = this.lists$.pipe(startWith({}));
 
-    return combineLatest(this.getPageEntry(), this.getLists()).pipe(
-      switchMap(stuff =>
-        combineLatest(this.currentPage$, this.lists$).pipe(
-          map(([pageEntry, lists]) => ({
-            ...pageEntry,
-            entries: this.mapEntries(pageEntry, lists)
-          }))
-        )
-      )
+    return combineLatest(pageEntry$, lists$).pipe(
+      map(([page, lists]) => ({
+        ...page,
+        entries: this.mapEntries(page, lists)
+      })),
+      distinctUntilChanged()
     );
   }
 
-  private getPageEntry(): Observable<PageEntry> {
-    return this.currentPath$.pipe(
-      take(1),
-      switchMap(path =>
-        ajax(buildPageUrl(path)).pipe(
-          map(response => response.response as PageEntry),
-          tap(pageEntry =>
-            this.innerPages$.next([...this.innerPages$.value, pageEntry])
-          )
-        )
-      )
-    );
-  }
-
-  private getLists(): Observable<List[]> {
-    return this.currentPage$.pipe(
-      take(1),
-      switchMap(page =>
-        this.queueGetList(page).pipe(
-          mergeMap(listIds =>
-            iif(() => !!listIds.length, this.getListsAcc(listIds), of([]))
-          )
-        )
-      )
+  private getPageEntry(path: string): Observable<PageEntry> {
+    return ajax(buildPageUrl(path)).pipe(
+      map(response => response.response as PageEntry)
     );
   }
 
   private getListsAcc(listIds: string[]): Observable<List[]> {
     return ajax(this.buildListUri(listIds)).pipe(
-      map(map => map.response as List[]),
-      mergeMap(lists =>
-        from(lists).pipe(
-          tap(list => this.innerLists$.next([...this.innerLists$.value, list])),
-          map(() => lists)
-        )
-      )
+      map(map => map.response as List[])
     );
   }
 
@@ -117,11 +106,13 @@ export class PageDataService {
       .map(e => e.list.id);
   }
 
-  private mapEntries(pageEntry: PageEntry, lists: List[]) {
+  private mapEntries(pageEntry: PageEntry, lists: Dictionary<List>): Entry[] {
     return pageEntry.entries.map(e => {
-      const list = lists.find(l => e.list && e.list.id === l.id);
-      if (list) {
-        e.list = { ...e.list, ...list };
+      if (e.list) {
+        const list = lists[e.list.id];
+        if (list) {
+          e.list = { ...e.list, ...lists[e.list.id] };
+        }
       }
       return e;
     });

@@ -69,7 +69,8 @@ export class PageDataService {
 
   private getEmptyLists(pageEntry: PageEntry): string[] {
     return pageEntry.entries
-      .filter(e => e.list && !e.list.items.length)
+      .filter(e => e.list)
+      .filter(e => !e.list.items.length)
       .map(e => e.list.id);
   }
 

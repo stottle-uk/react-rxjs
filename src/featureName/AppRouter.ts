@@ -20,9 +20,9 @@ export class AppRouter<T> {
   }
 
   constructor(private routerConfig: RouterConfig<T>) {
-    window.onpopstate = () => this.nextRoute(this.getWithowPath());
+    window.onpopstate = () => this.nextRoute(this.getLocationPath());
 
-    this.nextRoute(this.getWithowPath());
+    this.nextRoute(this.getLocationPath());
   }
 
   go(location: string): void {
@@ -43,7 +43,7 @@ export class AppRouter<T> {
     this.innerActivedRoute$.next(route);
   }
 
-  private getWithowPath(): string {
+  private getLocationPath(): string {
     return window.location.pathname + window.location.search;
   }
 }

@@ -10,8 +10,6 @@ export interface AppProps {
 
 class App extends Component<AppProps, any> {
   changeUrl = (e: any): void => {
-    console.log(e.currentTarget.pathname);
-
     e.preventDefault();
     const location = e.currentTarget.pathname;
     this.props.router.go(location);

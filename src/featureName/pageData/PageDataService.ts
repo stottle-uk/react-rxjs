@@ -1,5 +1,4 @@
 import { combineLatest, from, iif, Observable, of, ReplaySubject } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
 import {
   bufferTime,
   distinctUntilChanged,
@@ -12,6 +11,7 @@ import {
   tap
 } from 'rxjs/operators';
 import { Entry, List, PageEntry } from '../Testdata';
+import { RocketService } from './RocketService';
 
 export interface Dictionary<T> {
   [key: string]: T;
@@ -20,27 +20,14 @@ export interface Dictionary<T> {
 export class PageDataService {
   private innerPage$ = new ReplaySubject<PageEntry>();
 
-  get pages$(): Observable<Dictionary<PageEntry>> {
-    return this.innerPage$.pipe(
-      map(page => ({
-        [page.path]: page
-      })),
-      scan(
-        (acc, curr) => ({
-          ...acc,
-          ...curr
-        }),
-        {} as Dictionary<PageEntry>
-      )
-    );
-  }
+  constructor(private rocket: RocketService) {}
 
   get lists$(): Observable<Dictionary<List>> {
     return this.innerPage$.pipe(
       switchMap(page =>
         this.queueGetList(page).pipe(
           mergeMap(listIds =>
-            iif(() => !!listIds.length, this.getListsAcc(listIds), of())
+            iif(() => !!listIds.length, this.rocket.getLists(listIds), of([]))
           ),
           mergeMap(lists => from(lists)),
           map(list => ({
@@ -59,9 +46,9 @@ export class PageDataService {
   }
 
   getHomePageData(path: string): Observable<PageEntry> {
-    const pageEntry$ = this.getPageEntry(path).pipe(
-      tap(page => this.innerPage$.next(page))
-    );
+    const pageEntry$ = this.rocket
+      .getPageEntry(path)
+      .pipe(tap(page => this.innerPage$.next(page)));
     const lists$ = this.lists$.pipe(startWith({}));
 
     return combineLatest(pageEntry$, lists$).pipe(
@@ -73,31 +60,11 @@ export class PageDataService {
     );
   }
 
-  private getPageEntry(path: string): Observable<PageEntry> {
-    return ajax(buildPageUrl(path)).pipe(
-      map(response => response.response as PageEntry)
-    );
-  }
-
-  private getListsAcc(listIds: string[]): Observable<List[]> {
-    return ajax(this.buildListUri(listIds)).pipe(
-      map(map => map.response as List[])
-    );
-  }
-
   private queueGetList(pageEntry: PageEntry): Observable<string[]> {
     return from(this.getEmptyLists(pageEntry)).pipe(
       filter(id => +id > 0),
       bufferTime(100, null, 5)
     );
-  }
-
-  private buildListUri(listIds: string[]): string {
-    // return listsUrls[0];
-    const yt = encodeURIComponent(
-      listIds.map(listId => `${listId}|page_size=24`).join(',')
-    );
-    return `https://cdn.telecineplay.com.br/api/lists?device=web_browser&ff=idp,ldp&ids=${yt}&segments=globo,trial&sub=Subscriber`;
   }
 
   private getEmptyLists(pageEntry: PageEntry): string[] {
@@ -117,10 +84,4 @@ export class PageDataService {
       return e;
     });
   }
-}
-
-function buildPageUrl(path: string): string {
-  const encodePath = encodeURIComponent(path);
-
-  return `https://cdn.telecineplay.com.br/api/page?device=web_browser&ff=idp%2Cldp&list_page_size=24&max_list_prefetch=3&path=${encodePath}&segments=globo%2Ctrial&sub=Subscriber&text_entry_format=html`;
 }

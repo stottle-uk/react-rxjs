@@ -2,9 +2,11 @@ import { AppRouter } from './featureName/AppRouter';
 import HomePage from './featureName/HomePage';
 import OtherPage from './featureName/OtherPage';
 import { PageDataService } from './featureName/pageData/PageDataService';
+import { RocketService } from './featureName/pageData/RocketService';
 import { PageEntry } from './featureName/Testdata';
 
-const dataService = new PageDataService();
+const rocketService = new RocketService();
+const dataService = new PageDataService(rocketService);
 export const router = new AppRouter<PageEntry>({
   defaultRoute: '',
   routes: [

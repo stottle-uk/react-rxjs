@@ -27,7 +27,7 @@ export class AppRouter<T> {
 
   go(location: string): void {
     history.pushState({}, window.document.title, location);
-    this.nextRoute(location);
+    this.nextRoute(decodeURIComponent(location));
   }
 
   forward(): void {
@@ -44,6 +44,8 @@ export class AppRouter<T> {
   }
 
   private getLocationPath(): string {
-    return window.location.pathname + window.location.search;
+    return decodeURIComponent(
+      window.location.pathname + window.location.search
+    );
   }
 }

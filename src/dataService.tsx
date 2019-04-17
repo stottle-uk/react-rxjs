@@ -29,6 +29,12 @@ export const router = new AppRouter<PageEntry>({
       path: '/lancamentos-de-filmes',
       template: OtherPage,
       data: path => dataService.getHomePageData(path)
+    },
+    {
+      name: 'Mamma_Mia_Lá_Vamos_Nós_De_Novo_11947',
+      path: '/filme/Mamma_Mia_Lá_Vamos_Nós_De_Novo_11947',
+      template: OtherPage,
+      data: path => dataService.getHomePageData(path)
     }
   ]
 });

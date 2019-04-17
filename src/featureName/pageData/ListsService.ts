@@ -38,18 +38,6 @@ export class ListsService {
   }
 
   getLists(listIds: string[]): Observable<List> {
-    // // const source = from([1, 2, 3, 4, 5, 6]);
-    // console.log(listIds);
-
-    // const source = from(listIds).pipe(withLatestFrom(this.listsCache$));
-    // //first value is true, second false
-    // const [evens, odds] = partition(
-    //   ([listId, listsCache]: [string, Dictionary<List>]) => !!listsCache[listId]
-    // )(source);
-
-    // evens.subscribe(console.log);
-    // odds.subscribe(console.log);
-
     return merge(this.getHttpLists(listIds), this.getCachedLists(listIds)).pipe(
       defaultIfEmpty({} as List)
     );

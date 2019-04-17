@@ -29,7 +29,7 @@ class OtherPage extends React.Component<PageEntry, any> {
       <div>
         <h1>{this.props.title}</h1>
         {this.props.entries && this.renderEntries(this.props.entries)}
-        <pre>{JSON.stringify(this.props, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );
   }

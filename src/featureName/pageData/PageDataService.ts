@@ -1,57 +1,27 @@
-import { combineLatest, from, iif, Observable, of, ReplaySubject } from 'rxjs';
-import {
-  bufferTime,
-  distinctUntilChanged,
-  filter,
-  map,
-  mergeMap,
-  scan,
-  startWith,
-  switchMap,
-  tap
-} from 'rxjs/operators';
+import { combineLatest, Observable, ReplaySubject } from 'rxjs';
+import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { Entry, List, PageEntry } from '../Testdata';
-import { RocketService } from './RocketService';
-
-export interface Dictionary<T> {
-  [key: string]: T;
-}
+import { ListsService } from './ListsService';
+import { PagesService } from './PagesService';
 
 export class PageDataService {
   private innerPage$ = new ReplaySubject<PageEntry>();
 
-  constructor(private rocket: RocketService) {}
+  constructor(private pages: PagesService, private lists: ListsService) {}
 
-  get lists$(): Observable<Dictionary<List>> {
+  get lists$(): Observable<List> {
     return this.innerPage$.pipe(
-      switchMap(page =>
-        this.queueGetList(page).pipe(
-          mergeMap(listIds =>
-            iif(() => !!listIds.length, this.rocket.getLists(listIds), of([]))
-          ),
-          mergeMap(lists => from(lists)),
-          map(list => ({
-            [list.id]: list
-          })),
-          scan(
-            (acc, curr) => ({
-              ...acc,
-              ...curr
-            }),
-            {} as Dictionary<List>
-          )
-        )
-      )
+      map(page => this.getEmptyLists(page)),
+      switchMap(listIds => this.lists.getLists(listIds))
     );
   }
 
   getHomePageData(path: string): Observable<PageEntry> {
-    const pageEntry$ = this.rocket
+    const pageEntry$ = this.pages
       .getPageEntry(path)
       .pipe(tap(page => this.innerPage$.next(page)));
-    const lists$ = this.lists$.pipe(startWith({}));
 
-    return combineLatest(pageEntry$, lists$).pipe(
+    return combineLatest(pageEntry$, this.lists$).pipe(
       map(([page, lists]) => ({
         ...page,
         entries: this.mapEntries(page, lists)
@@ -60,29 +30,22 @@ export class PageDataService {
     );
   }
 
-  private queueGetList(pageEntry: PageEntry): Observable<string[]> {
-    return from(this.getEmptyLists(pageEntry)).pipe(
-      filter(id => +id > 0),
-      bufferTime(100, null, 5)
-    );
-  }
-
   private getEmptyLists(pageEntry: PageEntry): string[] {
     return pageEntry.entries
       .filter(e => e.list)
       .filter(e => !e.list.items.length)
+      .filter(e => +e.list.id > 0)
       .map(e => e.list.id);
   }
 
-  private mapEntries(pageEntry: PageEntry, lists: Dictionary<List>): Entry[] {
-    return pageEntry.entries.map(e => {
-      if (e.list) {
-        const list = lists[e.list.id];
-        if (list) {
-          e.list = { ...e.list, ...lists[e.list.id] };
-        }
-      }
-      return e;
-    });
+  private mapEntries(pageEntry: PageEntry, list: List): Entry[] {
+    return !!list
+      ? pageEntry.entries.map(entry => {
+          if (entry && entry.list && entry.list.id === list.id) {
+            entry.list = { ...entry.list, ...list };
+          }
+          return entry;
+        })
+      : pageEntry.entries;
   }
 }

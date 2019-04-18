@@ -6,9 +6,9 @@ import { PageDataService } from './featureName/pageData/PageDataService';
 import { PagesService } from './featureName/pageData/PagesService';
 import { PageEntry } from './featureName/Testdata';
 
-const rocketService = new PagesService();
+const pagesService = new PagesService();
 const listsService = new ListsService();
-const dataService = new PageDataService(rocketService, listsService);
+const dataService = new PageDataService(pagesService, listsService);
 export const router = new AppRouter<PageEntry>({
   defaultRoute: '',
   routes: [

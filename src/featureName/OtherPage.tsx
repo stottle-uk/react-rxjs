@@ -1,16 +1,7 @@
 import React, { ComponentType } from 'react';
+import NotFound from './NotFound';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
 import { Entry, PageEntry } from './Testdata';
-
-class NotFound extends React.Component<Entry, any> {
-  render() {
-    return this.props ? (
-      <div>{this.props.template} not defined</div>
-    ) : (
-      <div>fack!</div>
-    );
-  }
-}
 
 class OtherPage extends React.Component<PageEntry, any> {
   componentDidMount(): void {

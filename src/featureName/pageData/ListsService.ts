@@ -1,8 +1,17 @@
-import { empty, from, iif, merge, Observable, ReplaySubject } from 'rxjs';
+import {
+  empty,
+  from,
+  iif,
+  merge,
+  Observable,
+  ReplaySubject,
+  Subject
+} from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import {
   bufferTime,
   defaultIfEmpty,
+  distinctUntilChanged,
   filter,
   map,
   mergeMap,
@@ -12,19 +21,20 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { List } from '../Testdata';
+import { List, Paging } from '../Testdata';
 
 export interface Dictionary<T> {
-  [key: string]: T;
+  [key: string]: { [key: number]: T };
 }
 
 export class ListsService {
   private innerListCache$ = new ReplaySubject<List>();
+  private innerPaging$ = new Subject<Paging>();
 
   get listsCache$(): Observable<Dictionary<List>> {
     return this.innerListCache$.pipe(
       map(list => ({
-        [list.id]: list
+        [list.id]: { [list.paging.page]: { ...list } }
       })),
       scan(
         (acc, curr) => ({
@@ -38,24 +48,32 @@ export class ListsService {
   }
 
   getLists(listIds: string[]): Observable<List> {
-    return merge(this.getHttpLists(listIds), this.getCachedLists(listIds)).pipe(
-      defaultIfEmpty({} as List)
+    return merge(
+      this.getHttpLists(listIds),
+      // this.getCachedLists(listIds),
+      this.getMoreLists()
+    ).pipe(defaultIfEmpty({} as List));
+  }
+
+  getMore(paging: Paging): void {
+    this.innerPaging$.next(paging);
+  }
+
+  private getCachedLists(listIds: string[]): Observable<List> {
+    return from(listIds).pipe(
+      withLatestFrom(this.listsCache$),
+      filter(
+        ([listId, listCache]) => !!listCache[listId] && !!listCache[listId][0]
+      ),
+      map(([listId, listCache]) => listCache[listId][0])
     );
   }
 
-  private getCachedLists(listIds: string[]) {
+  private getHttpLists(listIds: string[]): Observable<List> {
     return from(listIds).pipe(
-      withLatestFrom(this.listsCache$),
-      filter(([listId, listCache]) => !!listCache[listId]),
-      map(([listId, listCache]) => listCache[listId])
-    );
-  }
-
-  private getHttpLists(listIds: string[]) {
-    return from(listIds).pipe(
-      withLatestFrom(this.listsCache$),
-      filter(([listId, listCache]) => !listCache[listId]),
-      map(([listId, _]) => listId),
+      // withLatestFrom(this.listsCache$),
+      // filter(([listId, listCache]) => !listCache[listId]),
+      // map(([listId, _]) => listId),
       bufferTime(50, null, 5),
       mergeMap(ids =>
         iif(
@@ -69,6 +87,20 @@ export class ListsService {
           empty()
         )
       )
+    );
+  }
+
+  private getMoreLists(): Observable<List> {
+    return this.innerPaging$.pipe(
+      distinctUntilChanged(),
+      map(paging => `https://cdn.telecineplay.com.br/api/${paging.next}`),
+      switchMap(nextUrl =>
+        ajax(nextUrl).pipe(
+          map(response => response.response as List),
+          tap(list => this.innerListCache$.next(list))
+        )
+      ),
+      startWith({} as List)
     );
   }
 

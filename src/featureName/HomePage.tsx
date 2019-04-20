@@ -1,5 +1,6 @@
 import React, { ComponentType } from 'react';
 import NotFound from './NotFound';
+import { Route } from './Route';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
 import { Entry, PageEntry } from './Testdata';
 
@@ -39,7 +40,7 @@ class HomePage extends React.Component<PageEntry, any> {
   }
 }
 
-export default HomePage;
+export default Route(HomePage);
 
 const pageEntries: { [hey: string]: ComponentType<any> } = {
   P2: P2PageEntry,

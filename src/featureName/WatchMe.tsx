@@ -22,6 +22,7 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
         takeUntil(this.destory$),
         switchMap(location =>
           location.data(location.path).pipe(
+            tap(console.log),
             map(pageEntryData => ({
               data: pageEntryData,
               template: location.template

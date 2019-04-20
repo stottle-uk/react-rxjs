@@ -73,7 +73,7 @@ export interface Authorization {
 
 export interface Paging {
   total?: number;
-  page?: number;
+  page: number;
   size?: number;
   options?: Options;
   next?: string;
@@ -93,8 +93,9 @@ export interface List {
   path?: string;
   items: Item[];
   size?: number;
-  paging?: Paging;
+  paging: Paging;
   images?: Images2;
+  getMore: (paging: Paging) => void;
 }
 
 export interface CustomFields2 {

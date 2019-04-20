@@ -3,12 +3,20 @@ import { Entry, List } from '../Testdata';
 import './P2TemplateEntry.css';
 
 class P2PageEntry extends React.Component<Entry, any> {
+  getMore() {
+    this.props.list.getMore(this.props.list.paging);
+  }
+
   render() {
     return (
       <div>
         <h1>
           {this.props.list.title} <small>{this.props.template}</small>{' '}
         </h1>
+        {this.props.list.getMore && (
+          <button onClick={this.getMore.bind(this)}>click</button>
+        )}
+
         <div className="list-row">{this.renderList(this.props.list)}</div>
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
@@ -16,6 +24,8 @@ class P2PageEntry extends React.Component<Entry, any> {
   }
 
   private renderList(list: List) {
+    // console.log(list);
+
     return list.items.map(item => (
       <div key={item.id}>
         <img src={item.images ? item.images.poster : ''} alt="" />

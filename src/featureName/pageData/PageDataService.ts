@@ -1,5 +1,5 @@
 import { combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Entry, List, PageEntry } from '../Testdata';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
@@ -22,27 +22,33 @@ export class PageDataService {
       .pipe(tap(page => this.innerPage$.next(page)));
 
     return combineLatest(pageEntry$, this.lists$).pipe(
+      tap(d => console.log(d)),
       map(([page, lists]) => ({
         ...page,
         entries: this.mapEntries(page, lists)
-      })),
-      distinctUntilChanged()
+      }))
     );
   }
 
   private getEmptyLists(pageEntry: PageEntry): string[] {
-    return pageEntry.entries
-      .filter(e => e.list)
-      .filter(e => !e.list.items.length)
-      .filter(e => +e.list.id > 0)
-      .map(e => e.list.id);
+    return !!pageEntry.entries
+      ? pageEntry.entries
+          .filter(e => e.list)
+          .filter(e => !e.list.items.length)
+          .filter(e => +e.list.id > 0)
+          .map(e => e.list.id)
+      : [];
   }
 
   private mapEntries(pageEntry: PageEntry, list: List): Entry[] {
-    return !!list
+    return !!list && pageEntry.entries
       ? pageEntry.entries.map(entry => {
           if (entry && entry.list && entry.list.id === list.id) {
-            entry.list = { ...entry.list, ...list };
+            entry.list.items = [...entry.list.items, ...list.items];
+            entry.list.paging = list.paging;
+          }
+          if (entry.list) {
+            entry.list.getMore = this.lists.getMore.bind(this.lists);
           }
           return entry;
         })

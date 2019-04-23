@@ -20,12 +20,11 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
     this.props.router.activedRoute$
       .pipe(
         takeUntil(this.destory$),
-        switchMap(location =>
-          location.data(location.path).pipe(
-            tap(console.log),
-            map(pageEntryData => ({
-              data: pageEntryData,
-              template: location.template
+        switchMap(route =>
+          route.data(route.path).pipe(
+            map(pageData => ({
+              data: pageData,
+              template: route.template
             })),
             tap(state => this.setState(state))
           )

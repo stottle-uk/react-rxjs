@@ -17,7 +17,7 @@ export function Route(WrappedComponent: ComponentType<PageEntry>) {
     }
 
     componentDidMount() {
-      someFunction();
+      // someFunction();
       // ... that takes care of the subscription...
       // DataSource.addChangeListener(this.handleChange);
     }

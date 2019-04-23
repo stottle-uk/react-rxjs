@@ -39,10 +39,22 @@ export class AppRouter<T> {
   }
 
   private nextRoute(location: string): void {
-    const route = this.routerConfig.routes.find(
-      r => r.path === decodeURIComponent(location)
-    );
-    this.innerActivedRoute$.next(route);
+    const route = this.routerConfig.routes.filter(r => {
+      if (location.startsWith('/filme/') && r.path.startsWith('/filme/')) {
+        return true;
+      }
+
+      return r.path === decodeURIComponent(location);
+    });
+
+    if (location.startsWith('/filme/')) {
+      this.innerActivedRoute$.next({
+        ...route[0],
+        path: location
+      });
+    } else {
+      this.innerActivedRoute$.next(route[0]);
+    }
   }
 
   private getLocationPath(): string {

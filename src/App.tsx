@@ -25,11 +25,8 @@ class App extends Component<AppProps, any> {
         <a href="/lancamentos-de-filmes" onClick={this.changeUrl}>
           Other
         </a>
-        <a
-          href="/filme/Mamma_Mia_Lá_Vamos_Nós_De_Novo_11947"
-          onClick={this.changeUrl}
-        >
-          Film
+        <a href="/filmes-comedia/g" onClick={this.changeUrl}>
+          Category
         </a>
         <WatchMe router={this.props.router} />
       </div>

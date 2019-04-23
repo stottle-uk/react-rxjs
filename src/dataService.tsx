@@ -19,8 +19,8 @@ export const router = new AppRouter<PageEntry>({
       data: path => dataService.getHomePageData(path)
     },
     {
-      name: 'Home',
-      path: '/home',
+      name: '/filmes-comedia/g',
+      path: '/filmes-comedia/g',
       template: HomePage,
       data: path => dataService.getHomePageData(path)
     },
@@ -31,8 +31,8 @@ export const router = new AppRouter<PageEntry>({
       data: path => dataService.getHomePageData(path)
     },
     {
-      name: 'Mamma_Mia_Lá_Vamos_Nós_De_Novo_11947',
-      path: '/filme/Mamma_Mia_Lá_Vamos_Nós_De_Novo_11947',
+      name: 'Film Detail',
+      path: '/filme/:filmId',
       template: OtherPage,
       data: path => dataService.getHomePageData(path)
     }

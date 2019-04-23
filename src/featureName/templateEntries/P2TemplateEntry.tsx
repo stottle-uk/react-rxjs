@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from '../../dataService';
 import { Entry, List } from '../Testdata';
 import './P2TemplateEntry.css';
 
@@ -23,12 +24,20 @@ class P2PageEntry extends React.Component<Entry, any> {
     );
   }
 
+  changeUrl = (e: any): void => {
+    e.preventDefault();
+    const location = e.currentTarget.pathname;
+    router.go(location);
+  };
+
   private renderList(list: List) {
     // console.log(list);
 
     return list.items.map(item => (
       <div key={item.id}>
-        <img src={item.images ? item.images.poster : ''} alt="" />
+        <a href={item.path} onClick={this.changeUrl}>
+          <img src={item.images ? item.images.poster : ''} alt="" />
+        </a>
       </div>
     ));
   }

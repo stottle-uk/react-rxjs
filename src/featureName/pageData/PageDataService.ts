@@ -5,9 +5,7 @@ import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
 export class PageDataService {
-  private innerPage$ = new ReplaySubject<PageEntry>();
-
-  constructor(private pages: PagesService, private lists: ListsService) {}
+  private innerPage$ = new ReplaySubject<PageEntry>(1);
 
   get lists$(): Observable<List> {
     return this.innerPage$.pipe(
@@ -16,13 +14,14 @@ export class PageDataService {
     );
   }
 
+  constructor(private pages: PagesService, private lists: ListsService) {}
+
   getHomePageData(path: string): Observable<PageEntry> {
-    const pageEntry$ = this.pages
+    const page$ = this.pages
       .getPageEntry(path)
       .pipe(tap(page => this.innerPage$.next(page)));
 
-    return combineLatest(pageEntry$, this.lists$).pipe(
-      tap(d => console.log(d)),
+    return combineLatest(page$, this.lists$).pipe(
       map(([page, lists]) => ({
         ...page,
         entries: this.mapEntries(page, lists)

@@ -25,12 +25,6 @@ export const router = new AppRouter<PageEntry>({
       data: path => dataService.getHomePageData(path)
     },
     {
-      name: 'lancamentos-de-filmes',
-      path: '/lancamentos-de-filmes',
-      template: OtherPage,
-      data: path => dataService.getHomePageData(path)
-    },
-    {
       name: 'Film Detail',
       path: '/filme/:filmId',
       template: OtherPage,

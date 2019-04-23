@@ -22,9 +22,6 @@ class App extends Component<AppProps, any> {
           Home
         </a>
         -
-        <a href="/lancamentos-de-filmes" onClick={this.changeUrl}>
-          Other
-        </a>
         <a href="/filmes-comedia/g" onClick={this.changeUrl}>
           Category
         </a>

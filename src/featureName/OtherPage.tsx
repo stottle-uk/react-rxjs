@@ -12,7 +12,7 @@ class OtherPage extends React.Component<PageEntry, any> {
     prevProps: Readonly<PageEntry>,
     prevState: Readonly<any>
   ): void {
-    console.log(this.props);
+    // console.log(this.props);
   }
 
   render() {

@@ -1,8 +1,7 @@
 import React, { ComponentType } from 'react';
 import NotFound from './NotFound';
-import { Route } from './Route';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
-import { Entry, PageEntry } from './Testdata';
+import { Entry, List, PageEntry } from './Testdata';
 
 class HomePage extends React.Component<PageEntry, any> {
   componentDidMount(): void {
@@ -28,21 +27,22 @@ class HomePage extends React.Component<PageEntry, any> {
 
   private renderEntries(entries: Entry[]): JSX.Element[] {
     return entries.map(entry => {
-      const Template = pageEntries[entry.template]
-        ? pageEntries[entry.template]
-        : NotFound;
-      return (
+      const Template = pageEntries[entry.template];
+
+      return Template ? (
         <div key={entry.id}>
-          <Template {...entry} />
+          <Template {...entry.list} />
         </div>
+      ) : (
+        <NotFound {...entry} />
       );
     });
   }
 }
 
-export default Route(HomePage);
+export default HomePage;
 
-const pageEntries: { [hey: string]: ComponentType<any> } = {
+const pageEntries: { [hey: string]: ComponentType<List> } = {
   P2: P2PageEntry,
   '2:3 Poster (Standard)': P2PageEntry,
   '2:3 Poster (Block Hero)': P2PageEntry

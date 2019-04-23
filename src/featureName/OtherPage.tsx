@@ -1,7 +1,8 @@
 import React, { ComponentType } from 'react';
 import NotFound from './NotFound';
+import CS5TemplateEntry from './templateEntries/CS5TemplateEntry';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
-import { Entry, PageEntry } from './Testdata';
+import { List, PageEntry } from './Testdata';
 
 class OtherPage extends React.Component<PageEntry, any> {
   componentDidMount(): void {
@@ -16,23 +17,24 @@ class OtherPage extends React.Component<PageEntry, any> {
   }
 
   render() {
+    console.log(this.props);
+
     return (
       <div>
-        <h1>{this.props.title}</h1>
-        {this.props.entries && this.renderEntries(this.props.entries)}
+        {this.props.entries && this.renderEntries(this.props)}
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );
   }
 
-  private renderEntries(entries: Entry[]): JSX.Element[] {
-    return entries.map(entry => {
-      const Template = pageEntries[entry.template]
-        ? pageEntries[entry.template]
-        : NotFound;
+  private renderEntries(page: PageEntry): JSX.Element[] {
+    return page.entries.map(entry => {
+      const Template = pageEntries[entry.template];
+      const list = entry.type === 'ListDetailEntry' ? page.list : entry.list;
+
       return (
         <div key={entry.id}>
-          <Template {...entry} />
+          {Template ? <Template {...list} /> : <NotFound {...entry} />}
         </div>
       );
     });
@@ -41,6 +43,7 @@ class OtherPage extends React.Component<PageEntry, any> {
 
 export default OtherPage;
 
-const pageEntries: { [hey: string]: ComponentType<any> } = {
-  P2: P2PageEntry
+const pageEntries: { [hey: string]: ComponentType<List> } = {
+  P2: P2PageEntry,
+  CS5: CS5TemplateEntry
 };

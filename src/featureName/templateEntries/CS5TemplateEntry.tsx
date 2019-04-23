@@ -3,21 +3,16 @@ import { router } from '../../dataService';
 import { Item, List } from '../Testdata';
 import './P2TemplateEntry.css';
 
-class P2PageEntry extends React.PureComponent<List> {
+class CS5TemplateEntry extends React.PureComponent<List> {
   getMore() {
     this.props.getMore(this.props.paging);
   }
 
   render() {
-    console.log(this.props);
-
     return (
       <div>
-        <h1>
-          <a href={this.props.path} onClick={this.changeUrl}>
-            {this.props.title} <small>{this.props.id}</small>{' '}
-          </a>
-        </h1>
+        <h1>{this.props.title}</h1>
+        <h2>{this.props.tagline}</h2>
         {this.props.getMore && (
           <button onClick={this.getMore.bind(this)}>click</button>
         )}
@@ -50,4 +45,4 @@ class P2PageEntry extends React.PureComponent<List> {
   }
 }
 
-export default P2PageEntry;
+export default CS5TemplateEntry;

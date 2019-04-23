@@ -8,6 +8,7 @@ export interface PageEntry {
   template: string;
   title: string;
   entries: Entry[];
+  list: List;
 }
 
 export interface Metadata {
@@ -88,6 +89,7 @@ export interface List {
   id: string;
   itemTypes?: string[];
   description?: string;
+  tagline: string;
   title?: string;
   shortDescription?: string;
   path?: string;

@@ -12,7 +12,9 @@ class P2PageEntry extends React.Component<Entry, any> {
     return (
       <div>
         <h1>
-          {this.props.list.title} <small>{this.props.template}</small>{' '}
+          <a href={this.props.list.path} onClick={this.changeUrl}>
+            {this.props.list.title} <small>{this.props.template}</small>{' '}
+          </a>
         </h1>
         {this.props.list.getMore && (
           <button onClick={this.getMore.bind(this)}>click</button>

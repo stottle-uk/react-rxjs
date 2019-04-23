@@ -44,10 +44,17 @@ export class AppRouter<T> {
         return true;
       }
 
+      if (
+        location.startsWith('/playlist/') &&
+        r.path.startsWith('/playlist/')
+      ) {
+        return true;
+      }
+
       return r.path === decodeURIComponent(location);
     });
 
-    if (location.startsWith('/filme/')) {
+    if (location.startsWith('/filme/') || location.startsWith('/playlist/')) {
       this.innerActivedRoute$.next({
         ...route[0],
         path: location

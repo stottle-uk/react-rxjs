@@ -35,6 +35,12 @@ export const router = new AppRouter<PageEntry>({
       path: '/filme/:filmId',
       template: OtherPage,
       data: path => dataService.getHomePageData(path)
+    },
+    {
+      name: 'Film Detail',
+      path: '/playlist/:playlist',
+      template: OtherPage,
+      data: path => dataService.getHomePageData(path)
     }
   ]
 });

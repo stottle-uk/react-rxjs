@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { PageEntry } from '../models/pageEntry';
 import { AppRouter } from './AppRouter';
-import { PageEntry } from './Testdata';
 
 interface WatchMeProps {
   router: AppRouter<PageEntry>;

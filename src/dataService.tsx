@@ -1,10 +1,10 @@
-import { AppRouter } from './featureName/AppRouter';
-import HomePage from './featureName/HomePage';
-import OtherPage from './featureName/OtherPage';
-import { ListsService } from './featureName/pageData/ListsService';
-import { PageDataService } from './featureName/pageData/PageDataService';
-import { PagesService } from './featureName/pageData/PagesService';
-import { PageEntry } from './featureName/Testdata';
+import { PageEntry } from './featureName/models/pageEntry';
+import { AppRouter } from './featureName/router/AppRouter';
+import { ListsService } from './featureName/services/ListsService';
+import { PageDataService } from './featureName/services/PageDataService';
+import { PagesService } from './featureName/services/PagesService';
+import HomePage from './featureName/templates/HomePage';
+import OtherPage from './featureName/templates/OtherPage';
 
 const pagesService = new PagesService();
 const listsService = new ListsService();

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
-import { AppRouter } from './featureName/AppRouter';
-import { PageEntry } from './featureName/Testdata';
-import WatchMe from './featureName/WatchMe';
+import { PageEntry } from './featureName/models/pageEntry';
+import { AppRouter } from './featureName/router/AppRouter';
+import WatchMe from './featureName/router/WatchMe';
 
 export interface AppProps {
   router: AppRouter<PageEntry>;

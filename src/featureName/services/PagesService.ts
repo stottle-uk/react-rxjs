@@ -9,7 +9,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { PageEntry } from '../Testdata';
+import { PageEntry } from '../models/pageEntry';
 
 export interface Dictionary<T> {
   [key: string]: T;

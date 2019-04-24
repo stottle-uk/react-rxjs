@@ -21,7 +21,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { List, Paging } from '../Testdata';
+import { List, Paging } from '../models/pageEntry';
 
 export interface Dictionary<T> {
   [key: string]: { [key: number]: T };

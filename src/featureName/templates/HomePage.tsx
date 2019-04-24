@@ -1,7 +1,7 @@
 import React, { ComponentType } from 'react';
+import { Entry, List, PageEntry } from '../models/pageEntry';
+import P2PageEntry from '../templateEntries/P2TemplateEntry';
 import NotFound from './NotFound';
-import P2PageEntry from './templateEntries/P2TemplateEntry';
-import { Entry, List, PageEntry } from './Testdata';
 
 class HomePage extends React.Component<PageEntry, any> {
   componentDidMount(): void {

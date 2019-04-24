@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from '../../dataService';
-import { Item, List } from '../Testdata';
+import { Item, List } from '../models/pageEntry';
 import './P2TemplateEntry.css';
 
 class CS5TemplateEntry extends React.PureComponent<List> {

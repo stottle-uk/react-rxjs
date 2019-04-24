@@ -1,6 +1,6 @@
 import { combineLatest, Observable, ReplaySubject } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { Entry, List, PageEntry } from '../Testdata';
+import { Entry, List, PageEntry } from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 

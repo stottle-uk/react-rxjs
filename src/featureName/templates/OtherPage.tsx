@@ -1,8 +1,8 @@
 import React, { ComponentType } from 'react';
+import { List, PageEntry } from '../models/pageEntry';
+import CS5TemplateEntry from '../templateEntries/CS5TemplateEntry';
+import P2PageEntry from '../templateEntries/P2TemplateEntry';
 import NotFound from './NotFound';
-import CS5TemplateEntry from './templateEntries/CS5TemplateEntry';
-import P2PageEntry from './templateEntries/P2TemplateEntry';
-import { List, PageEntry } from './Testdata';
 
 class OtherPage extends React.Component<PageEntry, any> {
   componentDidMount(): void {

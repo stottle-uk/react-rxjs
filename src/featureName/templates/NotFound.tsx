@@ -1,5 +1,5 @@
 import React from 'react';
-import { Entry } from './Testdata';
+import { Entry } from '../models/pageEntry';
 
 class NotFound extends React.Component<Entry, any> {
   render() {

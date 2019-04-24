@@ -1,15 +1,15 @@
 import React from 'react';
+import { RouterContext } from '../../dataService';
 
 export interface RouterOutletProps {}
 
 class RouterOutlet extends React.PureComponent<RouterOutletProps> {
   render() {
-    return <div />;
-    // return (
-    //   // <RouterContext.Consumer>
-    //   //   {context => <div>fsdfsdfsd{context.template}</div>}
-    //   // </RouterContext.Consumer>
-    // );
+    return (
+      <RouterContext.Consumer>
+        {context => <context.element {...context.data} />}
+      </RouterContext.Consumer>
+    );
   }
 }
 

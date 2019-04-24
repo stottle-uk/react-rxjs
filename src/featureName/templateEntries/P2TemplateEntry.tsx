@@ -26,7 +26,7 @@ class P2PageEntry extends React.PureComponent<List> {
     );
   }
 
-  private renderList(items: Item[]) {
+  private renderList(items: Item[]): React.ReactNodeArray {
     return (
       items &&
       items.map(item => (

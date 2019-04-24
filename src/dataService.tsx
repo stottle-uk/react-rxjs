@@ -8,8 +8,16 @@ import { PagesService } from './featureName/services/PagesService';
 import HomePage from './featureName/templates/HomePage';
 import OtherPage from './featureName/templates/OtherPage';
 
-export const RouterContext = React.createContext({
-  go: (path: string) => {}
+export interface RouterContextI {
+  go: (path: string) => void;
+  element: React.ComponentType<any>;
+  data: any;
+}
+
+export const RouterContext = React.createContext<RouterContextI>({
+  go: (path: string) => {},
+  element: () => <span />,
+  data: null
 });
 
 const httpService = new HttpService();

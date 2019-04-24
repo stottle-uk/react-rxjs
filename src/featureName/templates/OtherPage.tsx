@@ -17,8 +17,6 @@ class OtherPage extends React.Component<PageEntry, any> {
   }
 
   render() {
-    console.log(this.props);
-
     return (
       <div>
         {this.props.entries && this.renderEntries(this.props)}

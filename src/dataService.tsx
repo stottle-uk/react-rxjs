@@ -1,13 +1,15 @@
 import { PageEntry } from './featureName/models/pageEntry';
 import { AppRouter } from './featureName/router/AppRouter';
+import { HttpService } from './featureName/services/HttpService';
 import { ListsService } from './featureName/services/ListsService';
 import { PageDataService } from './featureName/services/PageDataService';
 import { PagesService } from './featureName/services/PagesService';
 import HomePage from './featureName/templates/HomePage';
 import OtherPage from './featureName/templates/OtherPage';
 
-const pagesService = new PagesService();
-const listsService = new ListsService();
+const httpService = new HttpService();
+const pagesService = new PagesService(httpService);
+const listsService = new ListsService(httpService);
 const dataService = new PageDataService(pagesService, listsService);
 export const router = new AppRouter<PageEntry>({
   defaultRoute: '',

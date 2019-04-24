@@ -1,5 +1,4 @@
 import { merge, Observable, of, ReplaySubject } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
 import {
   filter,
   map,
@@ -10,6 +9,7 @@ import {
   withLatestFrom
 } from 'rxjs/operators';
 import { PageEntry } from '../models/pageEntry';
+import { HttpService } from './HttpService';
 
 export interface Dictionary<T> {
   [key: string]: T;
@@ -34,6 +34,8 @@ export class PagesService {
     );
   }
 
+  constructor(private httpService: HttpService) {}
+
   getPageEntry(path: string): Observable<PageEntry> {
     return merge(this.getHttpPage(path), this.getCachedPage(path));
   }
@@ -52,10 +54,9 @@ export class PagesService {
       filter(([path, pageCache]) => !pageCache[path]),
       map(([path, _]) => path),
       switchMap(path =>
-        ajax(this.buildPageUrl(path)).pipe(
-          map(response => response.response),
-          tap(page => this.innerPageCache$.next(page))
-        )
+        this.httpService
+          .get<PageEntry>(this.buildPageUrl(path))
+          .pipe(tap(page => this.innerPageCache$.next(page)))
       )
     );
   }
@@ -63,6 +64,6 @@ export class PagesService {
   private buildPageUrl(path: string): string {
     const encodePath = encodeURIComponent(path);
 
-    return `https://cdn.telecineplay.com.br/api/page?device=web_browser&ff=idp%2Cldp&list_page_size=24&max_list_prefetch=3&path=${encodePath}&segments=globo%2Ctrial&sub=Subscriber&text_entry_format=html`;
+    return `/page?device=web_browser&ff=idp%2Cldp&list_page_size=24&max_list_prefetch=3&path=${encodePath}&segments=globo%2Ctrial&sub=Subscriber&text_entry_format=html`;
   }
 }

@@ -7,7 +7,6 @@ import {
   ReplaySubject,
   Subject
 } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
 import {
   bufferTime,
   defaultIfEmpty,
@@ -22,6 +21,7 @@ import {
   withLatestFrom
 } from 'rxjs/operators';
 import { List, Paging } from '../models/pageEntry';
+import { HttpService } from './HttpService';
 
 export interface Dictionary<T> {
   [key: string]: { [key: number]: T };
@@ -46,6 +46,8 @@ export class ListsService {
       startWith({})
     );
   }
+
+  constructor(private httpService: HttpService) {}
 
   getLists(listIds: string[]): Observable<List> {
     return merge(
@@ -78,12 +80,13 @@ export class ListsService {
       mergeMap(ids =>
         iif(
           () => !!ids.length,
-          ajax(this.buildListUri(ids)).pipe(
-            map(response => response.response as List[]),
-            switchMap(lists =>
-              from(lists).pipe(tap(list => this.innerListCache$.next(list)))
-            )
-          ),
+          this.httpService
+            .get<List[]>(this.buildListUri(ids))
+            .pipe(
+              switchMap(lists =>
+                from(lists).pipe(tap(list => this.innerListCache$.next(list)))
+              )
+            ),
           empty()
         )
       )
@@ -93,12 +96,11 @@ export class ListsService {
   private getMoreLists(): Observable<List> {
     return this.innerPaging$.pipe(
       distinctUntilChanged(),
-      map(paging => `https://cdn.telecineplay.com.br/api/${paging.next}`),
+      map(paging => `${paging.next}`),
       switchMap(nextUrl =>
-        ajax(nextUrl).pipe(
-          map(response => response.response as List),
-          tap(list => this.innerListCache$.next(list))
-        )
+        this.httpService
+          .get<List>(nextUrl)
+          .pipe(tap(list => this.innerListCache$.next(list)))
       ),
       startWith({} as List)
     );
@@ -109,6 +111,6 @@ export class ListsService {
     const yt = encodeURIComponent(
       listIds.map(listId => `${listId}|page_size=24`).join(',')
     );
-    return `https://cdn.telecineplay.com.br/api/lists?device=web_browser&ff=idp,ldp&ids=${yt}&segments=globo,trial&sub=Subscriber`;
+    return `/lists?device=web_browser&ff=idp,ldp&ids=${yt}&segments=globo,trial&sub=Subscriber`;
   }
 }

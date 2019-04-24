@@ -1,6 +1,6 @@
 import React from 'react';
-import { router } from '../../dataService';
 import { Item, List } from '../models/pageEntry';
+import Link from '../router/Link';
 import './P2TemplateEntry.css';
 
 class CS5TemplateEntry extends React.PureComponent<List> {
@@ -23,22 +23,14 @@ class CS5TemplateEntry extends React.PureComponent<List> {
     );
   }
 
-  changeUrl = (e: any): void => {
-    e.preventDefault();
-    const location = e.currentTarget.pathname;
-    router.go(location);
-  };
-
   private renderList(items: Item[]) {
-    // console.log(list);
-
     return (
       items &&
       items.map(item => (
         <div key={item.id}>
-          <a href={item.path} onClick={this.changeUrl}>
+          <Link to={item.path}>
             <img src={item.images ? item.images.poster : ''} alt="" />
-          </a>
+          </Link>
         </div>
       ))
     );

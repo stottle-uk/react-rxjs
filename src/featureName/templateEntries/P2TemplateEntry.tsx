@@ -1,6 +1,6 @@
 import React from 'react';
-import { router } from '../../dataService';
 import { Item, List } from '../models/pageEntry';
+import Link from '../router/Link';
 import './P2TemplateEntry.css';
 
 class P2PageEntry extends React.PureComponent<List> {
@@ -9,14 +9,12 @@ class P2PageEntry extends React.PureComponent<List> {
   }
 
   render() {
-    console.log(this.props);
-
     return (
       <div>
         <h1>
-          <a href={this.props.path} onClick={this.changeUrl}>
+          <Link to={this.props.path}>
             {this.props.title} <small>{this.props.id}</small>{' '}
-          </a>
+          </Link>
         </h1>
         {this.props.getMore && (
           <button onClick={this.getMore.bind(this)}>click</button>
@@ -28,22 +26,14 @@ class P2PageEntry extends React.PureComponent<List> {
     );
   }
 
-  changeUrl = (e: any): void => {
-    e.preventDefault();
-    const location = e.currentTarget.pathname;
-    router.go(location);
-  };
-
   private renderList(items: Item[]) {
-    // console.log(list);
-
     return (
       items &&
       items.map(item => (
         <div key={item.id}>
-          <a href={item.path} onClick={this.changeUrl}>
+          <Link to={item.path}>
             <img src={item.images ? item.images.poster : ''} alt="" />
-          </a>
+          </Link>
         </div>
       ))
     );

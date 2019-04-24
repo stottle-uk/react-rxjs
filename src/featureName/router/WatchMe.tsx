@@ -1,30 +1,32 @@
 import React, { Component } from 'react';
 import { Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { router, RouterContext } from '../../dataService';
 import { PageEntry } from '../models/pageEntry';
-import { AppRouter } from './AppRouter';
 
 interface WatchMeProps {
-  router: AppRouter<PageEntry>;
+  container: (
+    page: React.ComponentType<PageEntry>,
+    data: PageEntry
+  ) => JSX.Element;
 }
 
 interface WatchMeState {
-  data: PageEntry;
-  template: React.ComponentType<PageEntry>;
+  // data: PageEntry;
+  template: JSX.Element;
 }
 
 class WatchMe extends Component<WatchMeProps, WatchMeState> {
   destory$ = new Subject();
 
   componentDidMount(): void {
-    this.props.router.activedRoute$
+    router.activedRoute$
       .pipe(
         takeUntil(this.destory$),
         switchMap(route =>
           route.data(route.path).pipe(
             map(pageData => ({
-              data: pageData,
-              template: route.template
+              template: this.props.container(route.template, pageData)
             })),
             tap(state => this.setState(state))
           )
@@ -40,7 +42,13 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
 
   render() {
     return this.state ? (
-      <this.state.template {...this.state.data} />
+      <RouterContext.Provider
+        value={{
+          go: router.go.bind(router)
+        }}
+      >
+        {this.state.template}
+      </RouterContext.Provider>
     ) : (
       <div>waiting</div>
     );

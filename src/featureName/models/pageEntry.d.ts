@@ -56,7 +56,7 @@ export interface Item {
   title?: string;
   classification?: Classification;
   totalUserRatings?: number;
-  path?: string;
+  path: string;
   watchPath?: string;
   averageUserRating?: number;
   badge?: string;
@@ -92,7 +92,7 @@ export interface List {
   tagline: string;
   title?: string;
   shortDescription?: string;
-  path?: string;
+  path: string;
   items: Item[];
   size?: number;
   paging: Paging;

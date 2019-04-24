@@ -1,3 +1,4 @@
+import React from 'react';
 import { PageEntry } from './featureName/models/pageEntry';
 import { AppRouter } from './featureName/router/AppRouter';
 import { HttpService } from './featureName/services/HttpService';
@@ -6,6 +7,10 @@ import { PageDataService } from './featureName/services/PageDataService';
 import { PagesService } from './featureName/services/PagesService';
 import HomePage from './featureName/templates/HomePage';
 import OtherPage from './featureName/templates/OtherPage';
+
+export const RouterContext = React.createContext({
+  go: (path: string) => {}
+});
 
 const httpService = new HttpService();
 const pagesService = new PagesService(httpService);

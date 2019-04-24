@@ -33,7 +33,7 @@ export const router = new AppRouter<PageEntry>({
       data: path => dataService.getHomePageData(path)
     },
     {
-      name: 'Film Detail',
+      name: 'Playlist',
       path: '/playlist/:playlist',
       template: OtherPage,
       data: path => dataService.getHomePageData(path)

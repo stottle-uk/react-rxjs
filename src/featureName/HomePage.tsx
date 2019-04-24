@@ -29,12 +29,10 @@ class HomePage extends React.Component<PageEntry, any> {
     return entries.map(entry => {
       const Template = pageEntries[entry.template];
 
-      return Template ? (
+      return (
         <div key={entry.id}>
-          <Template {...entry.list} />
+          {Template ? <Template {...entry.list} /> : <NotFound {...entry} />}
         </div>
-      ) : (
-        <NotFound {...entry} />
       );
     });
   }

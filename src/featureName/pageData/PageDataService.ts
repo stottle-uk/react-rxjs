@@ -43,8 +43,12 @@ export class PageDataService {
     return !!list && pageEntry.entries
       ? pageEntry.entries.map(entry => {
           if (entry && entry.list && entry.list.id === list.id) {
-            entry.list.items = [...entry.list.items, ...list.items];
-            entry.list.paging = list.paging;
+            entry.list = {
+              ...entry.list,
+              ...list,
+              items: [...entry.list.items, ...list.items],
+              paging: list.paging
+            };
           }
           if (entry.list) {
             entry.list.getMore = this.lists.getMore.bind(this.lists);

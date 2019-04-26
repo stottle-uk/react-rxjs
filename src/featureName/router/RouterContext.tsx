@@ -1,16 +1,16 @@
 import React from 'react';
 
-export interface RouterContextI {
+export interface RouterContext {
   go: (path: string) => void;
   element: React.ComponentType<any>;
   data: any;
 }
 
-export const RouterContext = React.createContext<RouterContextI>({
+const context = React.createContext<RouterContext>({
   go: (path: string) => {},
   element: () => <span />,
   data: null
 });
 
-export const RouterProvider = RouterContext.Provider;
-export const RouterConsumer = RouterContext.Consumer;
+export const RouterProvider = context.Provider;
+export const RouterConsumer = context.Consumer;

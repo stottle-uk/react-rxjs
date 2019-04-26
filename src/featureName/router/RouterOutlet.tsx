@@ -1,14 +1,14 @@
 import React from 'react';
-import { RouterContext } from '../../dataService';
+import { RouterConsumer } from './RouterContext';
 
 export interface RouterOutletProps {}
 
 class RouterOutlet extends React.PureComponent<RouterOutletProps> {
   render() {
     return (
-      <RouterContext.Consumer>
+      <RouterConsumer>
         {context => <context.element {...context.data} />}
-      </RouterContext.Consumer>
+      </RouterConsumer>
     );
   }
 }

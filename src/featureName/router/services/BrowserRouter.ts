@@ -1,19 +1,8 @@
 import { Observable, ReplaySubject } from 'rxjs';
+import { RouterConfig, RouterConfigRoute } from '../types/router';
 
-export interface RouterConfig<T> {
-  defaultRoute: string;
-  routes: RouterConfigRoute<T>[];
-}
-
-export interface RouterConfigRoute<T> {
-  name: string;
-  path: string;
-  data: (path: string) => Observable<T>;
-  template: React.ComponentType<T>;
-}
-
-export class AppRouter<T> {
-  private innerActivedRoute$ = new ReplaySubject<RouterConfigRoute<T>>();
+export class BrowserRouter<T> {
+  private innerActivedRoute$ = new ReplaySubject<RouterConfigRoute<T>>(1);
 
   get activedRoute$(): Observable<RouterConfigRoute<T>> {
     return this.innerActivedRoute$.asObservable();
@@ -39,30 +28,35 @@ export class AppRouter<T> {
   }
 
   private nextRoute(location: string): void {
-    const route = this.routerConfig.routes.find(r =>
-      this.findRoute(location, r)
-    );
+    const route = this.findRoute(location);
 
     if (route) {
-      if (location.startsWith('/filme/') || location.startsWith('/playlist/')) {
-        this.innerActivedRoute$.next({
-          ...route,
-          path: location
-        });
-      } else {
-        this.innerActivedRoute$.next(route);
-      }
+      this.setActiveRoute(location, route);
+    } else {
+      this.innerActivedRoute$.next(route);
     }
-
-    // TODO capture not found
-    this.innerActivedRoute$.next(route);
   }
 
   private getLocationPath(): string {
     return window.location.pathname + window.location.search;
   }
 
-  private findRoute(location: string, route: RouterConfigRoute<T>): boolean {
+  private setActiveRoute(location: string, route: RouterConfigRoute<T>) {
+    if (location.startsWith('/filme/') || location.startsWith('/playlist/')) {
+      this.innerActivedRoute$.next({
+        ...route,
+        path: location
+      });
+    } else {
+      this.innerActivedRoute$.next(route);
+    }
+  }
+
+  private findRoute(location: string) {
+    return this.routerConfig.routes.find(r => this.matchRoute(location, r));
+  }
+
+  private matchRoute(location: string, route: RouterConfigRoute<T>): boolean {
     if (location.startsWith('/filme/') && route.path.startsWith('/filme/')) {
       return true;
     }

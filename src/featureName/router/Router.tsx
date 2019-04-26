@@ -1,23 +1,28 @@
 import React, { Component } from 'react';
 import { Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { router, RouterContext, RouterContextI } from '../../dataService';
+import { RouterProvider } from './RouterContext';
+import { BrowserRouter } from './services/BrowserRouter';
 
-interface WatchMeProps {}
+interface WatchMeProps<T> {
+  router: BrowserRouter<T>;
+}
 
-interface WatchMeState extends RouterContextI {}
+interface WatchMeState<T> {
+  element: React.ComponentType<T>;
+  data: T;
+}
 
-class WatchMe extends Component<WatchMeProps, WatchMeState> {
+class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
   destory$ = new Subject();
 
   componentDidMount(): void {
-    router.activedRoute$
+    this.props.router.activedRoute$
       .pipe(
         takeUntil(this.destory$),
         switchMap(route =>
           route.data(route.path).pipe(
             map(pageData => ({
-              go: router.go.bind(router),
               element: route.template,
               data: pageData
             })),
@@ -35,9 +40,12 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
 
   render() {
     return this.state ? (
-      <RouterContext.Provider
+      <RouterProvider
         children={this.props.children}
-        value={this.state}
+        value={{
+          go: this.props.router.go.bind(this.props.router),
+          ...this.state
+        }}
       />
     ) : (
       <div>waiting</div>
@@ -45,4 +53,4 @@ class WatchMe extends Component<WatchMeProps, WatchMeState> {
   }
 }
 
-export default WatchMe;
+export default Router;

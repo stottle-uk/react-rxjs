@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouterContext } from '../../dataService';
+import { RouterConsumer } from './RouterContext';
 
 export interface LinkProps {
   to: string;
@@ -17,7 +17,7 @@ class Link extends React.PureComponent<LinkProps> {
   render() {
     const { to, ...rest } = this.props;
     return (
-      <RouterContext.Consumer>
+      <RouterConsumer>
         {({ go }) => (
           <a
             {...rest}
@@ -25,7 +25,7 @@ class Link extends React.PureComponent<LinkProps> {
             href={to}
           />
         )}
-      </RouterContext.Consumer>
+      </RouterConsumer>
     );
   }
 }

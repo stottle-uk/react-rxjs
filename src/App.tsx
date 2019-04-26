@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 import './App.css';
+import { router } from './dataService';
 import Link from './featureName/router/Link';
+import Router from './featureName/router/Router';
 import RouterOutlet from './featureName/router/RouterOutlet';
-import WatchMe from './featureName/router/WatchMe';
 
 export interface AppProps {}
 
 class App extends PureComponent<AppProps> {
-  routerContainer(): React.ReactNode {
+  renderHeader(): React.ReactNode {
     return (
       <div>
         <Link to={'/'}>Home</Link>
@@ -21,10 +22,10 @@ class App extends PureComponent<AppProps> {
   render() {
     return (
       <div className="App">
-        <WatchMe>
-          {this.routerContainer()}
+        <Router router={router}>
+          {this.renderHeader()}
           <RouterOutlet />
-        </WatchMe>
+        </Router>
       </div>
     );
   }

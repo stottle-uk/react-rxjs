@@ -9,7 +9,7 @@ class Link extends React.PureComponent<LinkProps> {
   handleClick(
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     go: (path: string) => void
-  ) {
+  ): void {
     event.preventDefault();
     go(event.currentTarget.pathname);
   }

@@ -1,31 +1,77 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import './App.css';
-import { router } from './dataService';
+import { configService, dataService, router } from './dataService';
+import { Sitemap } from './featureName/models/config';
+import { PageEntry } from './featureName/models/pageEntry';
 import Link from './featureName/router/Link';
 import Router from './featureName/router/Router';
 import RouterOutlet from './featureName/router/RouterOutlet';
+import { RouterConfigRoute } from './featureName/router/types/router';
+import { pageEntries } from './pageEntries';
 
 export interface AppProps {}
 
-class App extends PureComponent<AppProps> {
-  renderHeader(): React.ReactNode {
+interface AppState {
+  ready: boolean;
+}
+
+class App extends Component<AppProps, AppState> {
+  state = {
+    ready: false
+  };
+
+  componentDidMount(): void {
+    configService
+      .getConfig()
+      .pipe(
+        map(config => config.sitemap),
+        map(sitemap => this.mapSitemapToRoute(sitemap)),
+        tap(routes => router.addRoutes(routes)),
+        tap(() =>
+          this.setState({
+            ready: true
+          })
+        )
+      )
+      .subscribe();
+  }
+
+  private mapSitemapToRoute(
+    sitemap: Sitemap[]
+  ): RouterConfigRoute<PageEntry>[] {
+    return sitemap.map(s => ({
+      name: s.title,
+      path: s.path,
+      template: pageEntries[s.template]
+    }));
+  }
+
+  private getRouteData(path: string): Observable<PageEntry> {
+    return dataService.getHomePageData(path);
+  }
+
+  render() {
+    return (
+      this.state.ready && (
+        <div className="App">
+          <Router router={router} getRouteData={this.getRouteData}>
+            {this.renderHeader()}
+            <RouterOutlet />
+          </Router>
+        </div>
+      )
+    );
+  }
+
+  private renderHeader(): React.ReactNode {
     return (
       <div>
         <Link to={'/'}>Home</Link>
         <span> - </span>
         <Link to={'/filmes-comedia/g'}>Category</Link>
         <hr />
-      </div>
-    );
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <Router router={router}>
-          {this.renderHeader()}
-          <RouterOutlet />
-        </Router>
       </div>
     );
   }

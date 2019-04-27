@@ -14,6 +14,11 @@ export class BrowserRouter<T> {
     this.nextRoute(this.getLocationPath());
   }
 
+  addRoutes(routes: RouterConfigRoute<T>[]): void {
+    this.routerConfig.routes = [...this.routerConfig.routes, ...routes];
+    this.nextRoute(this.getLocationPath());
+  }
+
   go(location: string): void {
     history.pushState({}, window.document.title, location);
     this.nextRoute(location);

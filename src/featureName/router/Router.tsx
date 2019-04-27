@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Observable, Subject } from 'rxjs';
-import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { RouterProvider } from './RouterContext';
 import { BrowserRouter } from './services/BrowserRouter';
 import { RouterConfigRoute } from './types/router';
@@ -23,7 +23,6 @@ class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
     this.props.router.activedRoute$
       .pipe(
         takeUntil(this.destory$),
-        filter(route => !!route),
         tap(route => this.props.onRouteChange(route)),
         switchMap(route =>
           this.props.getRouteData(route.path).pipe(

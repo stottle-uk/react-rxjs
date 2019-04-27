@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Observable } from 'rxjs';
-import { delay, map, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import './App.css';
 import { configService, dataService, router } from './dataService';
 import { Sitemap } from './featureName/models/config';
@@ -26,7 +26,6 @@ class App extends Component<AppProps, AppState> {
     configService
       .getConfig()
       .pipe(
-        delay(2000),
         map(config => config.sitemap),
         map(sitemap => this.mapSitemapToRoute(sitemap)),
         tap(routes => router.addRoutes(routes))

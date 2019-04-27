@@ -10,7 +10,6 @@ import {
 import {
   bufferTime,
   defaultIfEmpty,
-  delay,
   distinctUntilChanged,
   filter,
   map,
@@ -78,7 +77,6 @@ export class ListsService {
       // filter(([listId, listCache]) => !listCache[listId]),
       // map(([listId, _]) => listId),
       bufferTime(50, null, 5),
-      delay(2000),
       mergeMap(ids =>
         iif(
           () => !!ids.length,

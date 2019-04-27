@@ -3,10 +3,12 @@ import { Observable, Subject } from 'rxjs';
 import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { RouterProvider } from './RouterContext';
 import { BrowserRouter } from './services/BrowserRouter';
+import { RouterConfigRoute } from './types/router';
 
 interface WatchMeProps<T> {
   router: BrowserRouter<T>;
   getRouteData: (path: string) => Observable<T>;
+  onRouteChange: (path: RouterConfigRoute<T>) => void;
 }
 
 interface WatchMeState<T> {
@@ -22,6 +24,7 @@ class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
       .pipe(
         takeUntil(this.destory$),
         filter(route => !!route),
+        tap(route => this.props.onRouteChange(route)),
         switchMap(route =>
           this.props.getRouteData(route.path).pipe(
             map(pageData => ({

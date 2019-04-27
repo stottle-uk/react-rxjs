@@ -15,11 +15,13 @@ export interface AppProps {}
 
 interface AppState {
   ready: boolean;
+  routeName: string;
 }
 
 class App extends Component<AppProps, AppState> {
   state = {
-    ready: false
+    ready: false,
+    routeName: ''
   };
 
   componentDidMount(): void {
@@ -48,6 +50,12 @@ class App extends Component<AppProps, AppState> {
     }));
   }
 
+  private onRouteChange(path: RouterConfigRoute<PageEntry>): void {
+    this.setState({
+      routeName: path.path
+    });
+  }
+
   private getRouteData(path: string): Observable<PageEntry> {
     return dataService.getHomePageData(path);
   }
@@ -56,7 +64,11 @@ class App extends Component<AppProps, AppState> {
     return (
       this.state.ready && (
         <div className="App">
-          <Router router={router} getRouteData={this.getRouteData}>
+          <Router
+            router={router}
+            getRouteData={this.getRouteData}
+            onRouteChange={this.onRouteChange.bind(this)}
+          >
             {this.renderHeader()}
             <RouterOutlet />
           </Router>
@@ -68,6 +80,7 @@ class App extends Component<AppProps, AppState> {
   private renderHeader(): React.ReactNode {
     return (
       <div>
+        <pre>{this.state.routeName}</pre>
         <Link to={'/'}>Home</Link>
         <span> - </span>
         <Link to={'/filmes-comedia/g'}>Category</Link>

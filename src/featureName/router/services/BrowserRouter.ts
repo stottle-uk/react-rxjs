@@ -1,10 +1,10 @@
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { RouterConfig, RouterConfigRoute } from '../types/router';
 import { RouteMatcher } from './RouteMatcher';
 
 export class BrowserRouter<T> {
-  private innerPath$ = new ReplaySubject<string>(1);
+  private innerPath$ = new BehaviorSubject<string>(this.getLocationPath());
 
   get activedRoute$(): Observable<RouterConfigRoute<T>> {
     return this.innerPath$
@@ -29,8 +29,6 @@ export class BrowserRouter<T> {
     private routerMatcher: RouteMatcher<T>
   ) {
     window.onpopstate = () => this.nextRoute(this.getLocationPath());
-
-    this.nextRoute(this.getLocationPath());
   }
 
   addRoutes(routes: RouterConfigRoute<T>[]): void {

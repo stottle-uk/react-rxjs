@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Observable, Subject } from 'rxjs';
-import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { iif, Observable, of, Subject } from 'rxjs';
+import { delay, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { RouterProvider } from './RouterContext';
 import { BrowserRouter } from './services/BrowserRouter';
 import { RouterConfigRoute } from './types/router';
@@ -25,7 +25,11 @@ class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
         takeUntil(this.destory$),
         tap(route => this.props.onRouteChange(route)),
         switchMap(route =>
-          this.props.getRouteData(route.path).pipe(
+          iif(
+            () => route.name === this.props.router.defaultRoute.name,
+            of({} as T),
+            this.props.getRouteData(route.path).pipe(delay(1000))
+          ).pipe(
             map(pageData => ({
               element: route.template,
               data: pageData

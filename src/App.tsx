@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 import './App.css';
 import { configService, dataService, router } from './dataService';
 import { Sitemap } from './featureName/models/config';
@@ -14,13 +14,11 @@ import { pageEntries } from './pageEntries';
 export interface AppProps {}
 
 interface AppState {
-  ready: boolean;
   routeName: string;
 }
 
 class App extends Component<AppProps, AppState> {
   state = {
-    ready: false,
     routeName: ''
   };
 
@@ -28,14 +26,10 @@ class App extends Component<AppProps, AppState> {
     configService
       .getConfig()
       .pipe(
+        delay(2000),
         map(config => config.sitemap),
         map(sitemap => this.mapSitemapToRoute(sitemap)),
-        tap(routes => router.addRoutes(routes)),
-        tap(() =>
-          this.setState({
-            ready: true
-          })
-        )
+        tap(routes => router.addRoutes(routes))
       )
       .subscribe();
   }
@@ -62,18 +56,16 @@ class App extends Component<AppProps, AppState> {
 
   render() {
     return (
-      this.state.ready && (
-        <div className="App">
-          <Router
-            router={router}
-            getRouteData={this.getRouteData}
-            onRouteChange={this.onRouteChange.bind(this)}
-          >
-            {this.renderHeader()}
-            <RouterOutlet />
-          </Router>
-        </div>
-      )
+      <div className="App">
+        <Router
+          router={router}
+          getRouteData={this.getRouteData}
+          onRouteChange={this.onRouteChange.bind(this)}
+        >
+          {this.renderHeader()}
+          <RouterOutlet />
+        </Router>
+      </div>
     );
   }
 

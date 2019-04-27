@@ -9,11 +9,19 @@ export class BrowserRouter<T> {
   get activedRoute$(): Observable<RouterConfigRoute<T>> {
     return this.innerPath$
       .asObservable()
-      .pipe(map(route => this.routerMatcher.matchRoute(this.routes, route)));
+      .pipe(
+        map(path =>
+          this.routerMatcher.matchRoute(this.routes, path, this.defaultRoute)
+        )
+      );
   }
 
   get routes(): RouterConfigRoute<T>[] {
     return this.routerConfig.routes;
+  }
+
+  get defaultRoute(): RouterConfigRoute<T> {
+    return this.routerConfig.defaultRoute;
   }
 
   constructor(

@@ -1,6 +1,7 @@
 import React from 'react';
 
 export interface RouterConfig<T> {
+  defaultRoute: RouterConfigRoute<T>;
   routes: RouterConfigRoute<T>[];
 }
 

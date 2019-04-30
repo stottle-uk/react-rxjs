@@ -22,9 +22,9 @@ export class PageDataService {
       .pipe(tap(page => this.innerPage$.next(page)));
 
     return combineLatest(page$, this.lists$).pipe(
-      map(([page, lists]) => ({
+      map(([page, list]) => ({
         ...page,
-        entries: this.mapEntries(page, lists)
+        entries: this.mapEntries(page, list)
       }))
     );
   }

@@ -1,21 +1,22 @@
 import React from 'react';
+import Link from '../../router/Link';
+import GetMore from '../components/GetMore';
 import { Item, List } from '../models/pageEntry';
-import Link from '../router/Link';
 import './P2TemplateEntry.css';
 
-class CS5TemplateEntry extends React.PureComponent<List> {
-  getMore() {
-    this.props.getMore(this.props.paging);
-  }
-
+class P2PageEntry extends React.PureComponent<List> {
   render() {
     return (
       <div>
-        <h1>{this.props.title}</h1>
-        <h2>{this.props.tagline}</h2>
-        {this.props.getMore && (
-          <button onClick={this.getMore.bind(this)}>click</button>
-        )}
+        <h1>
+          <Link to={this.props.path}>
+            {this.props.title} <small>{this.props.id}</small>{' '}
+          </Link>
+        </h1>
+
+        <GetMore className="test" page={this.props.paging}>
+          More
+        </GetMore>
 
         <div className="list-row">{this.renderList(this.props.items)}</div>
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
@@ -23,7 +24,7 @@ class CS5TemplateEntry extends React.PureComponent<List> {
     );
   }
 
-  private renderList(items: Item[]) {
+  private renderList(items: Item[]): React.ReactNodeArray {
     return (
       items &&
       items.map(item => (
@@ -37,4 +38,4 @@ class CS5TemplateEntry extends React.PureComponent<List> {
   }
 }
 
-export default CS5TemplateEntry;
+export default P2PageEntry;

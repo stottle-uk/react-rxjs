@@ -1,24 +1,21 @@
 import React from 'react';
+import Link from '../../router/Link';
 import { Item, List } from '../models/pageEntry';
-import Link from '../router/Link';
 import './P2TemplateEntry.css';
 
-class P2PageEntry extends React.PureComponent<List> {
+class CS5TemplateEntry extends React.PureComponent<List> {
   getMore() {
-    this.props.getMore(this.props.paging);
+    // this.props.getMore(this.props.paging);
   }
 
   render() {
     return (
       <div>
-        <h1>
-          <Link to={this.props.path}>
-            {this.props.title} <small>{this.props.id}</small>{' '}
-          </Link>
-        </h1>
-        {this.props.getMore && (
+        <h1>{this.props.title}</h1>
+        <h2>{this.props.tagline}</h2>
+        {/* {this.props.getMore && (
           <button onClick={this.getMore.bind(this)}>click</button>
-        )}
+        )} */}
 
         <div className="list-row">{this.renderList(this.props.items)}</div>
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
@@ -26,7 +23,7 @@ class P2PageEntry extends React.PureComponent<List> {
     );
   }
 
-  private renderList(items: Item[]): React.ReactNodeArray {
+  private renderList(items: Item[]) {
     return (
       items &&
       items.map(item => (
@@ -40,4 +37,4 @@ class P2PageEntry extends React.PureComponent<List> {
   }
 }
 
-export default P2PageEntry;
+export default CS5TemplateEntry;

@@ -1,7 +1,7 @@
 import { ComponentType } from 'react';
-import { PageEntry } from './featureName/models/pageEntry';
-import HomePage from './featureName/templates/HomePage';
-import OtherPage from './featureName/templates/OtherPage';
+import { PageEntry } from './models/pageEntry';
+import HomePage from './templates/HomePage';
+import OtherPage from './templates/OtherPage';
 
 const home = 'Home';
 const category = 'Category';

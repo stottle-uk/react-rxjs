@@ -2,14 +2,18 @@ import React, { Component } from 'react';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import './App.css';
-import { configService, dataService, router } from './dataService';
-import { Sitemap } from './featureName/models/config';
-import { PageEntry } from './featureName/models/pageEntry';
-import Link from './featureName/router/Link';
-import Router from './featureName/router/Router';
-import RouterOutlet from './featureName/router/RouterOutlet';
-import { RouterConfigRoute } from './featureName/router/types/router';
-import { pageEntries } from './pageEntries';
+import { Sitemap } from './pageData/models/config';
+import { PageEntry } from './pageData/models/pageEntry';
+import {
+  configService,
+  dataService,
+  router
+} from './pageData/pageDataServices';
+import { pageEntries } from './pageData/pageEntries';
+import Link from './router/Link';
+import Router from './router/Router';
+import RouterOutlet from './router/RouterOutlet';
+import { RouterConfigRoute } from './router/types/router';
 
 export interface AppProps {}
 

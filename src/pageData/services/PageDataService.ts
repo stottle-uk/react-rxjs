@@ -50,9 +50,7 @@ export class PageDataService {
               paging: list.paging
             };
           }
-          if (entry.list) {
-            entry.list.getMore = this.lists.getMore.bind(this.lists);
-          }
+
           return entry;
         })
       : pageEntry.entries;

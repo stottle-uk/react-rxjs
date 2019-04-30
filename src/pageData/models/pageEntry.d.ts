@@ -97,7 +97,6 @@ export interface List {
   size?: number;
   paging: Paging;
   images?: Images2;
-  getMore: (paging: Paging) => void;
 }
 
 export interface CustomFields2 {

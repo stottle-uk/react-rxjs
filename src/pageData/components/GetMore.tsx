@@ -2,7 +2,7 @@ import React from 'react';
 import { Paging } from '../models/pageEntry';
 import { GetMoreConsumer } from '../pageDataServices';
 
-export interface GetMoreProps {
+export interface GetMoreProps extends React.HTMLProps<HTMLSpanElement> {
   className: string;
   page: Paging;
 }

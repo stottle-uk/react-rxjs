@@ -1,16 +1,24 @@
-import { combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
-import { Entry, List, PageEntry } from '../models/pageEntry';
+import { combineLatest, from, merge, Observable, ReplaySubject } from 'rxjs';
+import { map, startWith, switchMap, tap } from 'rxjs/operators';
+import { Entry, Item, List, PageEntry } from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
 export class PageDataService {
   private innerPage$ = new ReplaySubject<PageEntry>(1);
 
-  get lists$(): Observable<List> {
+  get queuedLists$(): Observable<List> {
     return this.innerPage$.pipe(
-      map(page => this.getEmptyLists(page)),
-      switchMap(listIds => this.lists.getLists(listIds))
+      map(page => this.getLists(page)),
+      switchMap(lists =>
+        from(lists).pipe(tap(list => this.lists.queueListId(list)))
+      )
+    );
+  }
+
+  get lists$(): Observable<List> {
+    return merge(this.queuedLists$, this.lists.lists$).pipe(
+      startWith({} as List)
     );
   }
 
@@ -22,6 +30,7 @@ export class PageDataService {
       .pipe(tap(page => this.innerPage$.next(page)));
 
     return combineLatest(page$, this.lists$).pipe(
+      tap(d => console.log(d)),
       map(([page, list]) => ({
         ...page,
         entries: this.mapEntries(page, list)
@@ -29,14 +38,17 @@ export class PageDataService {
     );
   }
 
-  private getEmptyLists(pageEntry: PageEntry): string[] {
-    return !!pageEntry.entries
+  private getLists(pageEntry: PageEntry): List[] {
+    const entryLists = !!pageEntry.entries
       ? pageEntry.entries
           .filter(e => e.list)
-          .filter(e => !e.list.items.length)
           .filter(e => +e.list.id > 0)
-          .map(e => e.list.id)
+          .map(e => e.list)
       : [];
+
+    return !!pageEntry.list && +pageEntry.list.id > 0
+      ? [pageEntry.list, ...entryLists]
+      : entryLists;
   }
 
   private mapEntries(pageEntry: PageEntry, list: List): Entry[] {
@@ -46,13 +58,18 @@ export class PageDataService {
             entry.list = {
               ...entry.list,
               ...list,
-              items: [...entry.list.items, ...list.items],
+              items: this.concatListItems(entry.list.items, list.items),
               paging: list.paging
             };
           }
-
           return entry;
         })
       : pageEntry.entries;
+  }
+
+  private concatListItems(originalLists: Item[], newLists: Item[]): Item[] {
+    return [...originalLists, ...newLists].filter(
+      (list, index, self) => self.findIndex(t => t.id === list.id) === index
+    );
   }
 }

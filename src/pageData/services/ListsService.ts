@@ -4,6 +4,7 @@ import {
   iif,
   merge,
   Observable,
+  of,
   ReplaySubject,
   Subject
 } from 'rxjs';
@@ -23,18 +24,26 @@ import {
 import { List, Paging } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 
+// export interface Dictionary<T> {
+//   [key: string]: { [key: number]: T };
+// }
+
 export interface Dictionary<T> {
-  [key: string]: { [key: number]: T };
+  [key: string]: T;
 }
 
 export class ListsService {
+  private innerList$ = new Subject<List>();
   private innerListCache$ = new ReplaySubject<List>();
   private innerPaging$ = new Subject<Paging>();
 
   get listsCache$(): Observable<Dictionary<List>> {
     return this.innerListCache$.pipe(
+      // map(list => ({
+      //   [list.id]: { [list.paging.page]: { ...list } }
+      // })),
       map(list => ({
-        [list.id]: { [list.paging.page]: { ...list } }
+        [list.id]: list
       })),
       scan(
         (acc, curr) => ({
@@ -47,44 +56,31 @@ export class ListsService {
     );
   }
 
-  constructor(private httpService: HttpService) {}
-
-  getLists(listIds: string[]): Observable<List> {
-    return merge(
-      this.getHttpLists(listIds),
-      // this.getCachedLists(listIds),
-      this.getMoreLists()
-    ).pipe(defaultIfEmpty({} as List));
-  }
-
-  getMore(paging: Paging): void {
-    this.innerPaging$.next(paging);
-  }
-
-  private getCachedLists(listIds: string[]): Observable<List> {
-    return from(listIds).pipe(
-      withLatestFrom(this.listsCache$),
-      filter(
-        ([listId, listCache]) => !!listCache[listId] && !!listCache[listId][0]
+  get getMoreLists2(): Observable<List> {
+    return this.innerPaging$.pipe(
+      distinctUntilChanged(),
+      map(paging => `${paging.next}`),
+      switchMap(nextUrl =>
+        this.httpService
+          .get<List>(nextUrl)
+          .pipe(tap(list => this.addToCache(list)))
       ),
-      map(([listId, listCache]) => listCache[listId][0])
+      startWith({} as List)
     );
   }
 
-  private getHttpLists(listIds: string[]): Observable<List> {
-    return from(listIds).pipe(
-      // withLatestFrom(this.listsCache$),
-      // filter(([listId, listCache]) => !listCache[listId]),
-      // map(([listId, _]) => listId),
-      bufferTime(50, null, 5),
-      mergeMap(ids =>
+  get httpLists(): Observable<List> {
+    return this.innerList$.pipe(
+      filter(list => !list.items.length),
+      bufferTime(500, null, 5),
+      mergeMap(lists =>
         iif(
-          () => !!ids.length,
+          () => !!lists.length,
           this.httpService
-            .get<List[]>(this.buildListUri(ids))
+            .get<List[]>(this.buildListUri(lists))
             .pipe(
               switchMap(lists =>
-                from(lists).pipe(tap(list => this.innerListCache$.next(list)))
+                from(lists).pipe(tap(list => this.addToCache(list)))
               )
             ),
           empty()
@@ -93,23 +89,44 @@ export class ListsService {
     );
   }
 
-  private getMoreLists(): Observable<List> {
-    return this.innerPaging$.pipe(
-      distinctUntilChanged(),
-      map(paging => `${paging.next}`),
-      switchMap(nextUrl =>
-        this.httpService
-          .get<List>(nextUrl)
-          .pipe(tap(list => this.innerListCache$.next(list)))
-      ),
-      startWith({} as List)
+  get cachedLists(): Observable<List> {
+    return this.innerList$.pipe(
+      withLatestFrom(this.listsCache$),
+      mergeMap(([list, listCache]) =>
+        iif(
+          () => !!listCache[list.id],
+          of(listCache[list.id]),
+          of(list).pipe(tap(list => this.addToCache(list)))
+        )
+      )
     );
   }
 
-  private buildListUri(listIds: string[]): string {
+  get lists$(): Observable<List> {
+    return merge(this.httpLists, this.cachedLists, this.getMoreLists2).pipe(
+      defaultIfEmpty({} as List),
+      tap(d => console.log(d))
+    );
+  }
+
+  constructor(private httpService: HttpService) {}
+
+  queueListId(list: List): void {
+    this.innerList$.next(list);
+  }
+
+  getMore(paging: Paging): void {
+    this.innerPaging$.next(paging);
+  }
+
+  private addToCache(list: List): void {
+    this.innerListCache$.next(list);
+  }
+
+  private buildListUri(lists: List[]): string {
     // return listsUrls[0];
     const yt = encodeURIComponent(
-      listIds.map(listId => `${listId}|page_size=24`).join(',')
+      lists.map(listId => `${listId.id}|page_size=24`).join(',')
     );
     return `/lists?device=web_browser&ff=idp,ldp&ids=${yt}&segments=globo,trial&sub=Subscriber`;
   }

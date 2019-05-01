@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { combineLatest, interval, Observable } from 'rxjs';
+import { map, take, tap } from 'rxjs/operators';
 import './App.css';
 import { Sitemap } from './pageData/models/config';
 import { PageEntry } from './pageData/models/pageEntry';
@@ -33,6 +33,19 @@ class App extends Component<AppProps, AppState> {
         map(config => config.sitemap),
         map(sitemap => this.mapSitemapToRoute(sitemap)),
         tap(routes => router.addRoutes(routes))
+      )
+      .subscribe();
+
+    // this.testMe();
+  }
+
+  private testMe() {
+    const timer1$ = interval(1000).pipe(map(count => `timer 1 - ${count}`));
+    const timer2$ = interval(2000).pipe(map(count => `timer 2 - ${count}`));
+    combineLatest(timer1$, timer2$)
+      .pipe(
+        take(12),
+        tap(console.log)
       )
       .subscribe();
   }

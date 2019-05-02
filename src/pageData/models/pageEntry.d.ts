@@ -1,3 +1,12 @@
+export interface Dictionary<T> {
+  [key: string]: T;
+}
+
+export interface PageTemplateData {
+  pageEntry: PageEntry;
+  lists: Dictionary<List>;
+}
+
 export interface PageEntry {
   id: string;
   isStatic: boolean;

@@ -8,12 +8,8 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { PageEntry } from '../models/pageEntry';
+import { Dictionary, PageEntry } from '../models/pageEntry';
 import { HttpService } from './HttpService';
-
-export interface Dictionary<T> {
-  [key: string]: T;
-}
 
 export class PagesService {
   private innerPageCache$ = new ReplaySubject<PageEntry>();

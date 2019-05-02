@@ -1,39 +1,48 @@
 import React, { Component, ComponentType } from 'react';
-import { Entry, List, PageEntry } from '../models/pageEntry';
+import { Dictionary, Entry, List, PageTemplateData } from '../models/pageEntry';
 import P2PageEntry from '../templateEntries/P2TemplateEntry';
 import NotFound from './NotFound';
 
-class HomePage extends Component<PageEntry, any> {
+class HomePage extends Component<PageTemplateData, any> {
   componentDidMount(): void {
     console.log(this.props);
   }
 
   componentDidUpdate(
-    prevProps: Readonly<PageEntry>,
+    prevProps: Readonly<PageTemplateData>,
     prevState: Readonly<any>
   ): void {
     // console.log(this.props);
   }
 
   render() {
+    const { pageEntry, lists } = this.props;
+
     return (
       <div>
-        <h1>{this.props.title}</h1>
-        {this.props.entries && this.renderEntries(this.props.entries)}
+        <h1>{pageEntry.title}</h1>
+        {pageEntry.entries && this.renderEntries(pageEntry.entries, lists)}
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );
   }
 
-  private renderEntries(entries: Entry[]): JSX.Element[] {
+  private renderEntries(
+    entries: Entry[],
+    lists: Dictionary<List>
+  ): JSX.Element[] {
     return entries.map(entry => {
-      const Template = pageEntries[entry.template];
+      if (entry.type === 'ListEntry') {
+        const Template = pageEntries[entry.template];
+        const list = lists[entry.list.id];
 
-      return (
-        <div key={entry.id}>
-          {Template ? <Template {...entry.list} /> : <NotFound {...entry} />}
-        </div>
-      );
+        return (
+          <div key={entry.id}>
+            {Template ? <Template {...list} /> : <NotFound {...entry} />}
+          </div>
+        );
+      }
+      return <span key={entry.id} />;
     });
   }
 }

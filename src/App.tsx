@@ -3,7 +3,7 @@ import { combineLatest, interval, Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import './App.css';
 import { Sitemap } from './pageData/models/config';
-import { PageEntry } from './pageData/models/pageEntry';
+import { PageTemplateData } from './pageData/models/pageEntry';
 import {
   configService,
   dataService,
@@ -52,7 +52,7 @@ class App extends Component<AppProps, AppState> {
 
   private mapSitemapToRoute(
     sitemap: Sitemap[]
-  ): RouterConfigRoute<PageEntry>[] {
+  ): RouterConfigRoute<PageTemplateData>[] {
     return sitemap.map(s => ({
       name: s.title,
       path: s.path,
@@ -60,13 +60,13 @@ class App extends Component<AppProps, AppState> {
     }));
   }
 
-  private onRouteChange(path: RouterConfigRoute<PageEntry>): void {
+  private onRouteChange(path: RouterConfigRoute<PageTemplateData>): void {
     this.setState({
       routeName: path.path
     });
   }
 
-  private getRouteData(path: string): Observable<PageEntry> {
+  private getRouteData(path: string): Observable<PageTemplateData> {
     return dataService.getHomePageData(path);
   }
 

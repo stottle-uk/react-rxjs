@@ -5,6 +5,7 @@ import {
   merge,
   Observable,
   of,
+  OperatorFunction,
   ReplaySubject,
   Subject
 } from 'rxjs';
@@ -21,16 +22,8 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { List, Paging } from '../models/pageEntry';
+import { Dictionary, List, Paging } from '../models/pageEntry';
 import { HttpService } from './HttpService';
-
-// export interface Dictionary<T> {
-//   [key: string]: { [key: number]: T };
-// }
-
-export interface Dictionary<T> {
-  [key: string]: T;
-}
 
 export class ListsService {
   private innerList$ = new Subject<List>();
@@ -39,9 +32,6 @@ export class ListsService {
 
   get listsCache$(): Observable<Dictionary<List>> {
     return this.innerListCache$.pipe(
-      // map(list => ({
-      //   [list.id]: { [list.paging.page]: { ...list } }
-      // })),
       map(list => ({
         [list.id]: list
       })),
@@ -58,12 +48,12 @@ export class ListsService {
 
   get getMoreLists2(): Observable<List> {
     return this.innerPaging$.pipe(
+      map(paging => paging.next),
+      filter(next => !!next),
       distinctUntilChanged(),
-      map(paging => `${paging.next}`),
+      map(paging => `${paging}`),
       switchMap(nextUrl =>
-        this.httpService
-          .get<List>(nextUrl)
-          .pipe(tap(list => this.addToCache(list)))
+        this.httpService.get<List>(nextUrl).pipe(this.addToCache())
       ),
       startWith({} as List)
     );
@@ -78,11 +68,7 @@ export class ListsService {
           () => !!lists.length,
           this.httpService
             .get<List[]>(this.buildListUri(lists))
-            .pipe(
-              switchMap(lists =>
-                from(lists).pipe(tap(list => this.addToCache(list)))
-              )
-            ),
+            .pipe(switchMap(lists => from(lists).pipe(this.addToCache()))),
           empty()
         )
       )
@@ -96,7 +82,7 @@ export class ListsService {
         iif(
           () => !!listCache[list.id],
           of(listCache[list.id]),
-          of(list).pipe(tap(list => this.addToCache(list)))
+          of(list).pipe(tap(list => this.innerListCache$.next(list)))
         )
       )
     );
@@ -119,8 +105,17 @@ export class ListsService {
     this.innerPaging$.next(paging);
   }
 
-  private addToCache(list: List): void {
-    this.innerListCache$.next(list);
+  private addToCache(): OperatorFunction<List, List> {
+    return source =>
+      source.pipe(
+        withLatestFrom(this.listsCache$),
+        map(([list, cache]) => ({
+          ...cache[list.id],
+          ...list,
+          items: [...cache[list.id].items, ...list.items]
+        })),
+        tap(list => this.innerListCache$.next(list))
+      );
   }
 
   private buildListUri(lists: List[]): string {

@@ -1,6 +1,12 @@
 import { combineLatest, from, merge, Observable, ReplaySubject } from 'rxjs';
 import { map, startWith, switchMap, tap } from 'rxjs/operators';
-import { Entry, Item, List, PageEntry } from '../models/pageEntry';
+import {
+  Entry,
+  Item,
+  List,
+  PageEntry,
+  PageTemplateData
+} from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
@@ -24,17 +30,17 @@ export class PageDataService {
 
   constructor(private pages: PagesService, private lists: ListsService) {}
 
-  getHomePageData(path: string): Observable<PageEntry> {
+  getHomePageData(path: string): Observable<PageTemplateData> {
     const page$ = this.pages
       .getPageEntry(path)
       .pipe(tap(page => this.innerPage$.next(page)));
 
-    return combineLatest(page$, this.lists$).pipe(
-      tap(d => console.log(d)),
+    return combineLatest(page$, this.lists.listsCache$, this.lists$).pipe(
       map(([page, list]) => ({
-        ...page,
-        entries: this.mapEntries(page, list)
-      }))
+        pageEntry: page,
+        lists: list
+      })),
+      tap(d => console.log(d))
     );
   }
 
@@ -58,7 +64,7 @@ export class PageDataService {
             entry.list = {
               ...entry.list,
               ...list,
-              items: this.concatListItems(entry.list.items, list.items),
+              items: this.concatAndDedupListItems(entry.list.items, list.items),
               paging: list.paging
             };
           }
@@ -67,7 +73,10 @@ export class PageDataService {
       : pageEntry.entries;
   }
 
-  private concatListItems(originalLists: Item[], newLists: Item[]): Item[] {
+  private concatAndDedupListItems(
+    originalLists: Item[],
+    newLists: Item[]
+  ): Item[] {
     return [...originalLists, ...newLists].filter(
       (list, index, self) => self.findIndex(t => t.id === list.id) === index
     );

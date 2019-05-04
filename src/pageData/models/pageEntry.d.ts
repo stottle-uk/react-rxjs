@@ -17,7 +17,7 @@ export interface PageEntry {
   template: string;
   title: string;
   entries: Entry[];
-  list: List;
+  list?: List;
 }
 
 export interface Metadata {

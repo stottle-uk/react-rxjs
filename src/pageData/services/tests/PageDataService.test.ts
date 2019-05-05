@@ -23,6 +23,10 @@ describe('Page Data', () => {
         return of([testData.list1WithItems]);
       }
 
+      if (path.startsWith('nextListUrl')) {
+        return of(testData.list1WithItems);
+      }
+
       return of(testData.pageData);
     });
   });
@@ -33,14 +37,14 @@ describe('Page Data', () => {
       done();
     });
 
-    dataService.getHomePageData('/');
+    dataService.getPageData('/');
   });
 
   it('should return page data from cache', done => {
     dataService.currentPage$.pipe(tap(() => done())).subscribe();
 
-    dataService.getHomePageData('/');
-    dataService.getHomePageData('/');
+    dataService.getPageData('/');
+    dataService.getPageData('/');
     expect(httpSpy).toHaveBeenCalledTimes(1);
   });
 
@@ -49,7 +53,7 @@ describe('Page Data', () => {
 
     dataService.currentPage$.pipe(tap(() => done())).subscribe();
 
-    dataService.getHomePageData('/');
+    dataService.getPageData('/');
     expect(queueListIdSpy).toHaveBeenCalledTimes(
       testData.pageData.entries.length
     );
@@ -68,7 +72,7 @@ describe('Page Data', () => {
         done();
       });
 
-      dataService.getHomePageData('/');
+      dataService.getPageData('/');
     });
 
     it('should get lists from http', done => {
@@ -79,7 +83,23 @@ describe('Page Data', () => {
         done();
       });
 
-      dataService.getHomePageData('/');
+      dataService.getPageData('/');
+    });
+
+    it('should get more items for a list from http', done => {
+      dataService.currentPage$.subscribe();
+
+      dataService.lists$.pipe(skip(3)).subscribe(val => {
+        expect(val[testData.list1.id].items.length).toEqual(2);
+        done();
+      });
+
+      dataService.getPageData('/');
+
+      dataService.getMoreListItems({
+        page: 2,
+        next: 'nextListUrl'
+      });
     });
   });
 });

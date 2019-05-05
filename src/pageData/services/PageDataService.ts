@@ -1,6 +1,6 @@
 import { from, Observable, OperatorFunction, Subject } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { Dictionary, List, PageEntry } from '../models/pageEntry';
+import { Dictionary, List, PageEntry, Paging } from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
@@ -24,8 +24,12 @@ export class PageDataService {
 
   constructor(private pages: PagesService, private lists: ListsService) {}
 
-  getHomePageData(path: string): void {
+  getPageData(path: string): void {
     this.innerPath$.next(path);
+  }
+
+  getMoreListItems(paging: Paging): void {
+    this.lists.getMore(paging);
   }
 
   private queueLists(): OperatorFunction<PageEntry, PageEntry> {

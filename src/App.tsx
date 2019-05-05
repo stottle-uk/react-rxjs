@@ -67,7 +67,7 @@ class App extends Component<AppProps, AppState> {
   }
 
   private getRouteData(path: string): Observable<PageTemplateData> {
-    return dataService.getHomePageData(path);
+    return dataService.getPageData(path);
   }
 
   render() {

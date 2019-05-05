@@ -1,4 +1,13 @@
-import { empty, from, iif, merge, Observable, Subject } from 'rxjs';
+import {
+  combineLatest,
+  empty,
+  from,
+  iif,
+  merge,
+  Observable,
+  OperatorFunction,
+  Subject
+} from 'rxjs';
 import {
   bufferTime,
   distinctUntilChanged,
@@ -6,6 +15,7 @@ import {
   map,
   mergeMap,
   scan,
+  startWith,
   switchMap
 } from 'rxjs/operators';
 import { Dictionary, List, Paging } from '../models/pageEntry';
@@ -15,13 +25,14 @@ export class ListsService {
   private innerList$ = new Subject<List>();
   private innerPaging$ = new Subject<Paging>();
 
-  get getMoreLists2(): Observable<List> {
+  get getMoreLists(): Observable<List> {
     return this.innerPaging$.pipe(
       map(paging => paging.next),
       filter(next => !!next),
       distinctUntilChanged(),
       map(paging => `${paging}`),
-      switchMap(nextUrl => this.httpService.get<List>(nextUrl))
+      switchMap(nextUrl => this.httpService.get<List>(nextUrl)),
+      startWith({} as List)
     );
   }
 
@@ -41,8 +52,8 @@ export class ListsService {
     );
   }
 
-  get lists$(): Observable<Dictionary<List>> {
-    return merge(this.innerList$, this.httpLists, this.getMoreLists2).pipe(
+  get listsCache(): Observable<Dictionary<List>> {
+    return merge(this.innerList$, this.httpLists).pipe(
       map(list => ({
         [list.id]: list
       })),
@@ -53,7 +64,12 @@ export class ListsService {
         }),
         {} as Dictionary<List>
       )
-      // tap(d => console.log(d))
+    );
+  }
+
+  get lists$(): Observable<Dictionary<List>> {
+    return combineLatest(this.listsCache, this.getMoreLists).pipe(
+      this.concatLists()
     );
   }
 
@@ -69,6 +85,27 @@ export class ListsService {
 
   getList(listId: string): Observable<List[]> {
     return this.httpService.get<List[]>(this.buildListUri([listId]));
+  }
+
+  private concatLists(): OperatorFunction<
+    [Dictionary<List>, List],
+    Dictionary<List>
+  > {
+    return source =>
+      source.pipe(
+        map(([cache, list]) =>
+          Object.keys(list).length
+            ? {
+                ...cache,
+                [list.id]: {
+                  ...cache[list.id],
+                  ...list,
+                  items: [...cache[list.id].items, ...list.items]
+                }
+              }
+            : cache
+        )
+      );
   }
 
   private buildListUri(listIds: string[]): string {

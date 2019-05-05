@@ -39,7 +39,7 @@ export class ListsService {
   get httpLists(): Observable<List> {
     return this.innerList$.pipe(
       filter(list => !list.items.length),
-      bufferTime(50, null, 1),
+      bufferTime(50, null, 5),
       mergeMap(lists =>
         iif(
           () => !!lists.length,

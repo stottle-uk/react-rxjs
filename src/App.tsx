@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { combineLatest, interval, Observable } from 'rxjs';
+import { combineLatest, interval } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 import './App.css';
 import { Sitemap } from './pageData/models/config';
-import { PageTemplateData } from './pageData/models/pageEntry';
+import { PageEntry, PageTemplateData } from './pageData/models/pageEntry';
 import {
   configService,
   dataService,
@@ -19,11 +19,16 @@ export interface AppProps {}
 
 interface AppState {
   routeName: string;
+  pageData: PageTemplateData;
 }
 
 class App extends Component<AppProps, AppState> {
   state = {
-    routeName: ''
+    routeName: '',
+    pageData: {
+      pageEntry: {} as PageEntry,
+      lists: {}
+    }
   };
 
   componentDidMount(): void {
@@ -33,6 +38,22 @@ class App extends Component<AppProps, AppState> {
         map(config => config.sitemap),
         map(sitemap => this.mapSitemapToRoute(sitemap)),
         tap(routes => router.addRoutes(routes))
+      )
+      .subscribe();
+
+    combineLatest(dataService.currentPage$, dataService.lists$)
+      .pipe(
+        map(([pageEntry, lists]) => {
+          return {
+            pageEntry,
+            lists
+          };
+        }),
+        tap(pageData =>
+          this.setState({
+            pageData
+          })
+        )
       )
       .subscribe();
 
@@ -60,28 +81,27 @@ class App extends Component<AppProps, AppState> {
     }));
   }
 
-  private onRouteChange(path: RouterConfigRoute<PageTemplateData>): void {
+  private onRouteChange(route: RouterConfigRoute<PageTemplateData>): void {
+    dataService.getPageData(route.path);
     this.setState({
-      routeName: path.path
+      routeName: route.path
     });
   }
 
-  private getRouteData(path: string): Observable<PageTemplateData> {
-    return dataService.getPageData(path);
-  }
+  // private getRouteData(path: string): Observable<PageTemplateData> {
+  //   return dataService.getPageData(path);
+  // }
 
   render() {
     return (
-      <div className="App">
-        <Router
-          router={router}
-          getRouteData={this.getRouteData}
-          onRouteChange={this.onRouteChange.bind(this)}
-        >
-          {this.renderHeader()}
-          <RouterOutlet />
-        </Router>
-      </div>
+      this.state.pageData && (
+        <div className="App">
+          <Router router={router} onRouteChange={this.onRouteChange.bind(this)}>
+            {this.renderHeader()}
+            <RouterOutlet data={this.state.pageData} />
+          </Router>
+        </div>
+      )
     );
   }
 

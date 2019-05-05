@@ -3,13 +3,11 @@ import React from 'react';
 export interface RouterContext {
   go: (path: string) => void;
   element: React.ComponentType<any>;
-  data: any;
 }
 
 const context = React.createContext<RouterContext>({
   go: (path: string) => {},
-  element: () => <span />,
-  data: null
+  element: () => <span />
 });
 
 export const RouterProvider = context.Provider;

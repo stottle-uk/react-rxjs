@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import { iif, Observable, of, Subject } from 'rxjs';
-import { map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { map, takeUntil, tap } from 'rxjs/operators';
 import { RouterProvider } from './RouterContext';
 import { BrowserRouter } from './services/BrowserRouter';
 import { RouterConfigRoute } from './types/router';
 
 interface WatchMeProps<T> {
   router: BrowserRouter<T>;
-  getRouteData: (path: string) => Observable<T>;
   onRouteChange: (path: RouterConfigRoute<T>) => void;
 }
 
 interface WatchMeState<T> {
   element: React.ComponentType<T>;
-  data: T;
 }
 
 class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
@@ -24,19 +22,10 @@ class Router<T> extends Component<WatchMeProps<T>, WatchMeState<T>> {
       .pipe(
         takeUntil(this.destory$),
         tap(route => this.props.onRouteChange(route)),
-        switchMap(route =>
-          iif(
-            () => route.name === this.props.router.defaultRoute.name,
-            of({} as T),
-            this.props.getRouteData(route.path)
-          ).pipe(
-            map(pageData => ({
-              element: route.template,
-              data: pageData
-            })),
-            tap(state => this.setState(state))
-          )
-        )
+        map(route => ({
+          element: route.template
+        })),
+        tap(state => this.setState(state))
       )
       .subscribe();
   }

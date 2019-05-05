@@ -43,7 +43,7 @@ export class ListsService {
       switchMap(nextUrl =>
         this.httpService.get<List>(nextUrl).pipe(
           withLatestFrom(this.innerCache$),
-          tap(d => console.log(d)),
+          // tap(d => console.log(d)),
           map(([list, cache]) => ({
             ...cache[list.id],
             ...list,
@@ -59,9 +59,9 @@ export class ListsService {
       filter(list => !list.items.length),
       withLatestFrom(this.innerCache$),
       filter(([list, cache]) => cache[list.id] && !cache[list.id].items.length),
-      // tap(d => console.log(d)),
       map(([list, cache]) => list),
       bufferTime(0, null, 5),
+      // tap(d => console.log(d)),
       mergeMap(lists =>
         iif(
           () => !!lists.length,
@@ -100,10 +100,6 @@ export class ListsService {
 
   get lists$(): Observable<Dictionary<List>> {
     return this.listsCache$.pipe(tap(cache => this.innerCache$.next(cache)));
-    // return combineLatest(this.listsCache$).pipe(
-    //   // this.concatLists(),
-    //   tap(cache => this.innerCache$.next(cache))
-    // );
   }
 
   constructor(private httpService: HttpService) {}

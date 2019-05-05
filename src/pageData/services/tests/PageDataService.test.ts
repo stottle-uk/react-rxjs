@@ -31,32 +31,34 @@ describe('Page Data', () => {
     });
   });
 
-  it('should return page data from http', done => {
-    dataService.currentPage$.subscribe(val => {
-      expect(val).toEqual(testData.pageData);
-      done();
+  describe('Pages', () => {
+    it('should return page data from http', done => {
+      dataService.currentPage$.subscribe(val => {
+        expect(val).toEqual(testData.pageData);
+        done();
+      });
+
+      dataService.getPageData('/');
     });
 
-    dataService.getPageData('/');
-  });
+    it('should return page data from cache', done => {
+      dataService.currentPage$.pipe(tap(() => done())).subscribe();
 
-  it('should return page data from cache', done => {
-    dataService.currentPage$.pipe(tap(() => done())).subscribe();
+      dataService.getPageData('/');
+      dataService.getPageData('/');
+      expect(httpSpy).toHaveBeenCalledTimes(1);
+    });
 
-    dataService.getPageData('/');
-    dataService.getPageData('/');
-    expect(httpSpy).toHaveBeenCalledTimes(1);
-  });
+    it('should queue lists', done => {
+      const queueListIdSpy = jest.spyOn(listsService, 'queueList');
 
-  it('should queue lists', done => {
-    const queueListIdSpy = jest.spyOn(listsService, 'queueList');
+      dataService.currentPage$.pipe(tap(() => done())).subscribe();
 
-    dataService.currentPage$.pipe(tap(() => done())).subscribe();
-
-    dataService.getPageData('/');
-    expect(queueListIdSpy).toHaveBeenCalledTimes(
-      testData.pageData.entries.length
-    );
+      dataService.getPageData('/');
+      expect(queueListIdSpy).toHaveBeenCalledTimes(
+        testData.pageData.entries.length
+      );
+    });
   });
 
   describe('lists', () => {
@@ -99,12 +101,11 @@ describe('Page Data', () => {
       dataService.getPageData('/');
     });
 
-    fit('should get more items for a list from http', done => {
+    it('should get more items for a list from http', done => {
       dataService.currentPage$.subscribe();
 
       dataService.lists$
         .pipe(
-          tap(console.log),
           skip(2),
           tap(() =>
             dataService.getMoreListItems({
@@ -112,7 +113,6 @@ describe('Page Data', () => {
               next: 'nextListUrl'
             })
           ),
-          // skip(4),
           take(1)
         )
         .subscribe(val => {
@@ -121,11 +121,6 @@ describe('Page Data', () => {
         });
 
       dataService.getPageData('/');
-
-      // dataService.getMoreListItems({
-      //   page: 2,
-      //   next: 'nextListUrl'
-      // });
     });
   });
 });

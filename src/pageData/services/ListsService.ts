@@ -97,7 +97,7 @@ export class ListsService {
 
   constructor(private httpService: HttpService) {}
 
-  queueListId(list: List): void {
+  queueList(list: List): void {
     this.innerList$.next(list);
   }
 

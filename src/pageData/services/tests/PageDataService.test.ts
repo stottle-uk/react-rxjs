@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { skip, tap } from 'rxjs/operators';
+import { skip, take, tap } from 'rxjs/operators';
 import { HttpService } from '../HttpService';
 import { ListsService } from '../ListsService';
 import { PageDataService } from '../PageDataService';
@@ -63,14 +63,19 @@ describe('Page Data', () => {
     it('should get not get a list with items from http', done => {
       dataService.currentPage$.subscribe();
 
-      dataService.lists$.pipe(skip(2)).subscribe(val => {
-        expect(val).toEqual({
-          [testData.list1.id]: testData.list1WithItems,
-          [testData.list2.id]: testData.list2WithItems
+      dataService.lists$
+        .pipe(
+          skip(2),
+          take(1)
+        )
+        .subscribe(val => {
+          expect(val).toEqual({
+            [testData.list1.id]: testData.list1WithItems,
+            [testData.list2.id]: testData.list2WithItems
+          });
+          expect(httpSpy).toHaveBeenCalledTimes(2);
+          done();
         });
-        expect(httpSpy).toHaveBeenCalledTimes(2);
-        done();
-      });
 
       dataService.getPageData('/');
     });
@@ -78,28 +83,49 @@ describe('Page Data', () => {
     it('should get lists from http', done => {
       dataService.currentPage$.subscribe();
 
-      dataService.lists$.pipe(skip(1)).subscribe(val => {
-        expect(val).toEqual({ [testData.list1.id]: testData.list1WithItems });
-        done();
-      });
+      dataService.lists$
+        .pipe(
+          skip(2),
+          take(1)
+        )
+        .subscribe(val => {
+          expect(val).toEqual({
+            [testData.list1.id]: testData.list1WithItems,
+            [testData.list2.id]: testData.list2WithItems
+          });
+          done();
+        });
 
       dataService.getPageData('/');
     });
 
-    it('should get more items for a list from http', done => {
+    fit('should get more items for a list from http', done => {
       dataService.currentPage$.subscribe();
 
-      dataService.lists$.pipe(skip(3)).subscribe(val => {
-        expect(val[testData.list1.id].items.length).toEqual(2);
-        done();
-      });
+      dataService.lists$
+        .pipe(
+          tap(console.log),
+          skip(2),
+          tap(() =>
+            dataService.getMoreListItems({
+              page: 2,
+              next: 'nextListUrl'
+            })
+          ),
+          // skip(4),
+          take(1)
+        )
+        .subscribe(val => {
+          expect(val[testData.list1.id].items.length).toEqual(2);
+          done();
+        });
 
       dataService.getPageData('/');
 
-      dataService.getMoreListItems({
-        page: 2,
-        next: 'nextListUrl'
-      });
+      // dataService.getMoreListItems({
+      //   page: 2,
+      //   next: 'nextListUrl'
+      // });
     });
   });
 });

@@ -1,11 +1,10 @@
 import {
-  combineLatest,
+  BehaviorSubject,
   empty,
   from,
   iif,
   merge,
   Observable,
-  OperatorFunction,
   Subject
 } from 'rxjs';
 import {
@@ -15,31 +14,54 @@ import {
   map,
   mergeMap,
   scan,
-  startWith,
-  switchMap
+  switchMap,
+  tap,
+  withLatestFrom
 } from 'rxjs/operators';
 import { Dictionary, List, Paging } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 
 export class ListsService {
-  private innerList$ = new Subject<List>();
+  private innerCurrentList$ = new Subject<List>();
   private innerPaging$ = new Subject<Paging>();
+  private innerCache$ = new BehaviorSubject<Dictionary<List>>({});
 
-  get getMoreLists(): Observable<List> {
+  get currentList$(): Observable<List> {
+    return this.innerCurrentList$.asObservable().pipe(
+      withLatestFrom(this.innerCache$),
+      filter(([list, cache]) => !cache[list.id]),
+      map(([list, cache]) => list)
+    );
+  }
+
+  get moreLists$(): Observable<List> {
     return this.innerPaging$.pipe(
       map(paging => paging.next),
       filter(next => !!next),
       distinctUntilChanged(),
       map(paging => `${paging}`),
-      switchMap(nextUrl => this.httpService.get<List>(nextUrl)),
-      startWith({} as List)
+      switchMap(nextUrl =>
+        this.httpService.get<List>(nextUrl).pipe(
+          withLatestFrom(this.innerCache$),
+          tap(d => console.log(d)),
+          map(([list, cache]) => ({
+            ...cache[list.id],
+            ...list,
+            items: [...cache[list.id].items, ...list.items]
+          }))
+        )
+      )
     );
   }
 
-  get httpLists(): Observable<List> {
-    return this.innerList$.pipe(
+  get httpLists$(): Observable<List> {
+    return this.innerCurrentList$.pipe(
       filter(list => !list.items.length),
-      bufferTime(50, null, 5),
+      withLatestFrom(this.innerCache$),
+      filter(([list, cache]) => cache[list.id] && !cache[list.id].items.length),
+      // tap(d => console.log(d)),
+      map(([list, cache]) => list),
+      bufferTime(0, null, 5),
       mergeMap(lists =>
         iif(
           () => !!lists.length,
@@ -52,8 +74,17 @@ export class ListsService {
     );
   }
 
-  get listsCache(): Observable<Dictionary<List>> {
-    return merge(this.innerList$, this.httpLists).pipe(
+  get listsCache$(): Observable<Dictionary<List>> {
+    return merge(
+      this.innerCurrentList$.pipe(
+        withLatestFrom(this.innerCache$),
+        // tap(d => console.log(d)),
+        filter(([list, cache]) => !cache[list.id]),
+        map(([list, cache]) => list)
+      ),
+      this.httpLists$,
+      this.moreLists$
+    ).pipe(
       map(list => ({
         [list.id]: list
       })),
@@ -68,44 +99,21 @@ export class ListsService {
   }
 
   get lists$(): Observable<Dictionary<List>> {
-    return combineLatest(this.listsCache, this.getMoreLists).pipe(
-      this.concatLists()
-    );
+    return this.listsCache$.pipe(tap(cache => this.innerCache$.next(cache)));
+    // return combineLatest(this.listsCache$).pipe(
+    //   // this.concatLists(),
+    //   tap(cache => this.innerCache$.next(cache))
+    // );
   }
 
   constructor(private httpService: HttpService) {}
 
   queueList(list: List): void {
-    this.innerList$.next(list);
+    this.innerCurrentList$.next(list);
   }
 
   getMore(paging: Paging): void {
     this.innerPaging$.next(paging);
-  }
-
-  getList(listId: string): Observable<List[]> {
-    return this.httpService.get<List[]>(this.buildListUri([listId]));
-  }
-
-  private concatLists(): OperatorFunction<
-    [Dictionary<List>, List],
-    Dictionary<List>
-  > {
-    return source =>
-      source.pipe(
-        map(([cache, list]) =>
-          Object.keys(list).length
-            ? {
-                ...cache,
-                [list.id]: {
-                  ...cache[list.id],
-                  ...list,
-                  items: [...cache[list.id].items, ...list.items]
-                }
-              }
-            : cache
-        )
-      );
   }
 
   private buildListUri(listIds: string[]): string {

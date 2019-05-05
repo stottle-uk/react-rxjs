@@ -1,60 +1,22 @@
-import { merge, Observable, of, ReplaySubject } from 'rxjs';
-import {
-  filter,
-  map,
-  scan,
-  startWith,
-  switchMap,
-  tap,
-  withLatestFrom
-} from 'rxjs/operators';
-import { Dictionary, PageEntry } from '../models/pageEntry';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
+import { PageEntry } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 
 export class PagesService {
-  private innerPageCache$ = new ReplaySubject<PageEntry>();
-
-  get pageCache$(): Observable<Dictionary<PageEntry>> {
-    return this.innerPageCache$.pipe(
-      map(page => ({
-        [page.path]: page
-      })),
-      scan(
-        (acc, curr) => ({
-          ...acc,
-          ...curr
-        }),
-        {} as Dictionary<PageEntry>
-      ),
-      startWith({})
-    );
-  }
+  private pagesCache: { [key: string]: Observable<PageEntry> } = {};
 
   constructor(private httpService: HttpService) {}
 
   getPageEntry(path: string): Observable<PageEntry> {
-    return merge(this.getHttpPage(path), this.getCachedPage(path));
+    this.pagesCache[path] = this.pagesCache[path] || this.getPage(path);
+    return this.pagesCache[path];
   }
 
-  private getCachedPage(path: string) {
-    return of(path).pipe(
-      withLatestFrom(this.pageCache$),
-      filter(([path, pageCache]) => !!pageCache[path]),
-      map(([path, pageCache]) => pageCache[path])
-    );
-  }
-
-  private getHttpPage(path: string) {
-    return of(path).pipe(
-      withLatestFrom(this.pageCache$),
-      filter(([path, pageCache]) => !pageCache[path]),
-      map(([path, _]) => path),
-      switchMap(path =>
-        this.httpService
-          .get<PageEntry>(this.buildPageUrl(path))
-          .pipe(tap(page => this.innerPageCache$.next(page)))
-      )
-    );
+  private getPage(path: string): Observable<PageEntry> {
+    return this.httpService
+      .get<PageEntry>(this.buildPageUrl(path))
+      .pipe(shareReplay(1));
   }
 
   private buildPageUrl(path: string): string {

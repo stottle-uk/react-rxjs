@@ -1,4 +1,5 @@
 import { of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { Entry, Item, List, PageEntry, Paging } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 import { ListsService } from './ListsService';
@@ -47,64 +48,65 @@ const pageData: PageEntry = {
   isSystemPage: false,
   metadata: {},
   key: 'string',
-  path: 'string',
+  path: '/',
   template: 'string',
   title: 'string',
-  entries: [entry2, entry, entry2, entry2, entry2, entry2]
+  entries: [entry]
 };
 
-it('renders without crashing', done => {
-  const httpService = new HttpService();
-  const pagesService = new PagesService(httpService);
-  const listsService = new ListsService(httpService);
-  const dataService = new PageDataService(pagesService, listsService);
+const pageDataOther: PageEntry = {
+  id: 'string',
+  isStatic: false,
+  isSystemPage: false,
+  metadata: {},
+  key: 'string',
+  path: '/other',
+  template: 'string',
+  title: 'string',
+  entries: [entry]
+};
 
-  jest.spyOn(httpService, 'get').mockImplementation(path => {
-    if (
-      path ===
-      '/page?device=web_browser&ff=idp%2Cldp&list_page_size=24&max_list_prefetch=3&path=%2F&segments=globo%2Ctrial&sub=Subscriber&text_entry_format=html'
-    ) {
-      return of(pageData);
-    }
+describe('Page Data', () => {
+  let httpService: HttpService;
+  let pagesService: PagesService;
+  let listsService: ListsService;
+  let dataService: PageDataService;
+  let httpSpy: jest.SpyInstance;
 
-    console.log(path);
-    if (path.startsWith('/lists')) {
-      return of(list1);
-    }
-    return of({});
+  beforeEach(() => {
+    httpService = new HttpService();
+    pagesService = new PagesService(httpService);
+    listsService = new ListsService(httpService);
+    dataService = new PageDataService(pagesService, listsService);
+    httpSpy = jest
+      .spyOn(httpService, 'get')
+      .mockImplementation(() => of(pageData));
+    jest.clearAllMocks();
   });
-  let count = 0;
 
-  dataService.getHomePageData('/').subscribe(val => {
-    console.log(val);
-
-    if (count === 0) {
-      expect(val).toEqual({
-        pageEntry: pageData,
-        lists: {}
-      });
-    }
-
-    if ([1, 2, 3, 4, 5, 6].includes(count)) {
-      expect(val).toEqual({
-        pageEntry: pageData,
-        lists: {}
-      });
-    }
-
-    if (count === 7) {
-      expect(val).toEqual({
-        pageEntry: pageData,
-        lists: { [list2.id]: list2 }
-      });
-    }
-
-    console.log(count);
-
-    if (count > 8) {
+  it('should return page data from http', done => {
+    dataService.currentPage$.subscribe(val => {
+      expect(val).toEqual(pageData);
       done();
-    }
+    });
 
-    count++;
+    dataService.getHomePageData('/');
+  });
+
+  it('should return page data from cache', done => {
+    dataService.currentPage$.pipe(tap(() => done())).subscribe();
+
+    dataService.getHomePageData('/');
+    dataService.getHomePageData('/');
+    expect(httpSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should queue lists', done => {
+    const queueListIdSpy = jest.spyOn(listsService, 'queueListId');
+
+    dataService.currentPage$.pipe(tap(() => done())).subscribe();
+
+    dataService.getHomePageData('/');
+    expect(queueListIdSpy).toHaveBeenCalledTimes(1);
   });
 });

@@ -39,13 +39,17 @@ class OtherPage extends React.Component<PageTemplateData, any> {
     return page.entries.map(entry => {
       const Template = pageEntries[entry.template];
       const list = entry.type === 'ListDetailEntry' ? page.list : entry.list;
-      const foundList = lists[list.id];
 
-      return (
-        <div key={entry.id}>
-          {Template ? <Template {...foundList} /> : <NotFound {...entry} />}
-        </div>
-      );
+      if (list) {
+        const foundList = lists[list.id];
+
+        return (
+          <div key={entry.id}>
+            {Template ? <Template {...foundList} /> : <NotFound {...entry} />}
+          </div>
+        );
+      }
+      return <span />;
     });
   }
 }

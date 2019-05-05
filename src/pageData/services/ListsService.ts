@@ -90,8 +90,8 @@ export class ListsService {
 
   get lists$(): Observable<List> {
     return merge(this.httpLists, this.cachedLists, this.getMoreLists2).pipe(
-      defaultIfEmpty({} as List),
-      tap(d => console.log(d))
+      defaultIfEmpty({} as List)
+      // tap(d => console.log(d))
     );
   }
 

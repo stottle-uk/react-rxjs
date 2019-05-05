@@ -1,6 +1,6 @@
 import { from, Observable, OperatorFunction, Subject } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { List, PageEntry } from '../models/pageEntry';
+import { Dictionary, List, PageEntry } from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
@@ -16,6 +16,10 @@ export class PageDataService {
       switchMap(path => this.pages.getPageEntry(path)),
       this.queueLists()
     );
+  }
+
+  get lists$(): Observable<Dictionary<List>> {
+    return this.lists.lists$;
   }
 
   constructor(private pages: PagesService, private lists: ListsService) {}

@@ -51,6 +51,7 @@ export default HomePage;
 
 const pageEntries: { [hey: string]: ComponentType<List> } = {
   P2: P2PageEntry,
+  H7: P2PageEntry,
   '2:3 Poster (Standard)': P2PageEntry,
   '2:3 Poster (Block Hero)': P2PageEntry
 };

@@ -37,10 +37,12 @@ describe('Page Data', () => {
         console.log(val);
 
         // expect(val).toEqual(testData.pageData);
-        // done();
+        done();
       });
 
       dataService.getPageData('/');
+      // dataService.getPageData('/other');
+      // dataService.getPageData('/');
     });
 
     it('should return page data from http', done => {

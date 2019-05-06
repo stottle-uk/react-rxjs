@@ -14,7 +14,7 @@ describe('Page Data', () => {
   let httpSpy: jest.SpyInstance;
   let count = 0;
 
-  beforeAll(() => {
+  beforeEach(() => {
     httpService = new HttpService();
     pagesService = new PagesService(httpService);
     listsService = new ListsService(httpService);
@@ -27,7 +27,6 @@ describe('Page Data', () => {
       if (path.startsWith('nextListUrl')) {
         return of(testData.list1WithItems);
       }
-      console.log(path);
 
       if (
         path.includes(`path=${encodeURIComponent(testData.pageDataOther.path)}`)
@@ -40,28 +39,40 @@ describe('Page Data', () => {
   });
 
   describe('Pages', () => {
-    fit('should return page data from http', done => {
-      dataService.pageData$
-        // .pipe(first(pageData => !!pageData.pageEntry))
-        .pipe(
-          tap(d => console.log(d)),
-          tap(() => count++)
-        )
-        .subscribe(val => {
-          if (count === 3) {
-            dataService.getPageData(testData.pageDataOther.path);
-          }
+    // fit('should return page data from http', done => {
+    //   dataService.pageData$
+    //     // .pipe(first(pageData => !!pageData.pageEntry))
+    //     .pipe(
+    //       // tap(d => console.log(d)),
+    //       tap(() => count++)
+    //     )
+    //     .subscribe(val => {
+    //       if (count === 3) {
+    //         expect(val).toEqual({
+    //           pageEntry: testData.pageData,
+    //           lists: {
+    //             [testData.list1.id]: testData.list1WithItems,
+    //             [testData.list2.id]: testData.list2WithItems
+    //           }
+    //         });
+    //         dataService.getPageData(testData.pageDataOther.path);
+    //       }
 
-          // expect(val).toEqual(testData.pageData);
-          done();
-          // count++;
-        });
+    //       if (count > 3) {
+    //         console.log(val);
 
-      dataService.getPageData(testData.pageData.path);
+    //         done();
+    //       }
 
-      // dataService.getPageData('/other');
-      // dataService.getPageData('/');
-    });
+    //       // expect(val).toEqual(testData.pageData);
+    //       // count++;
+    //     });
+
+    //   dataService.getPageData(testData.pageData.path);
+
+    //   // dataService.getPageData('/other');
+    //   // dataService.getPageData('/');
+    // });
 
     it('should return page data from http', done => {
       dataService.currentPage$.subscribe(val => {

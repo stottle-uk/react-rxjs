@@ -79,9 +79,10 @@ class App extends Component<AppProps, AppState> {
   }
 
   private renderBody(): React.ReactNode {
-    return (
-      this.state &&
-      this.state.pageData && <RouterOutlet data={this.state.pageData} />
+    return this.state && this.state.pageData && !this.state.pageData.loading ? (
+      <RouterOutlet data={this.state.pageData} />
+    ) : (
+      <div>loading!!!</div>
     );
   }
 

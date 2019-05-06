@@ -3,6 +3,7 @@ export interface Dictionary<T> {
 }
 
 export interface PageTemplateData {
+  loading: boolean;
   pageEntry: PageEntry;
   lists: Dictionary<List>;
 }

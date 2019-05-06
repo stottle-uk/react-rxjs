@@ -12,7 +12,10 @@ class GetMore extends React.PureComponent<GetMoreProps> {
     const { page, ...rest } = this.props;
     return (
       <GetMoreConsumer>
-        {({ getMore }) => <span {...rest} onClick={() => getMore(page)} />}
+        {({ getMore }) =>
+          !!page &&
+          page.next && <span {...rest} onClick={() => getMore(page)} />
+        }
       </GetMoreConsumer>
     );
   }

@@ -1,4 +1,5 @@
 import {
+  BehaviorSubject,
   combineLatest,
   from,
   iif,
@@ -20,15 +21,22 @@ import { PagesService } from './PagesService';
 
 export class PageDataService {
   private innerPath$ = new Subject<string>();
+  private innerLoading$ = new BehaviorSubject<boolean>(false);
 
-  get path$(): Observable<string> {
+  private get loading$(): Observable<boolean> {
+    return this.innerLoading$.asObservable();
+  }
+
+  private get path$(): Observable<string> {
     return this.innerPath$.asObservable();
   }
 
-  get currentPage$(): Observable<PageEntry> {
+  private get currentPage$(): Observable<PageEntry> {
     return this.path$.pipe(
+      this.setLoadingStatus(true),
       switchMap(path => this.pages.getPageEntry(path)),
-      this.queueLists()
+      this.queueLists(),
+      this.setLoadingStatus(false)
     );
   }
 
@@ -37,8 +45,9 @@ export class PageDataService {
   }
 
   get pageData$(): Observable<PageTemplateData> {
-    return combineLatest(this.currentPage$, this.lists$).pipe(
-      map(([pageEntry, lists]) => ({
+    return combineLatest(this.currentPage$, this.lists$, this.loading$).pipe(
+      map(([pageEntry, lists, loading]) => ({
+        loading,
         pageEntry,
         lists
       }))
@@ -72,6 +81,10 @@ export class PageDataService {
           )
         )
       );
+  }
+
+  private setLoadingStatus<T>(loading: boolean): OperatorFunction<T, T> {
+    return source => source.pipe(tap(() => this.innerLoading$.next(loading)));
   }
 
   private getLists(pageEntry: PageEntry): List[] {

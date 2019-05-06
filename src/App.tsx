@@ -6,7 +6,7 @@ import { Sitemap } from './pageData/models/config';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import {
   configService,
-  dataService,
+  pagesDataService,
   router
 } from './pageData/pageDataServices';
 import { pageEntries } from './pageData/pageEntries';
@@ -36,7 +36,7 @@ class App extends Component<AppProps, AppState> {
       )
       .subscribe();
 
-    dataService.pageData$
+    pagesDataService.pageData$
       .pipe(
         takeUntil(this.destory$),
         tap(pageData =>
@@ -64,10 +64,7 @@ class App extends Component<AppProps, AppState> {
   }
 
   private onRouteChange(route: RouterConfigRoute<PageTemplateData>): void {
-    dataService.getPageData(route.path);
-    // this.setState({
-    //   routeName: route.path
-    // });
+    pagesDataService.getPageData(route.path);
   }
 
   render() {

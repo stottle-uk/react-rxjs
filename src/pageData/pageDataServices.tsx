@@ -13,7 +13,7 @@ export const httpService = new HttpService();
 export const configService = new ConfigService(httpService);
 export const pagesService = new PagesService(httpService);
 export const listsService = new ListsService(httpService);
-export const dataService = new PageDataService(pagesService, listsService);
+export const pagesDataService = new PageDataService(pagesService, listsService);
 export const routeMatcher = new RouteMatcher<PageTemplateData>();
 export const router = new BrowserRouter<PageTemplateData>(
   {

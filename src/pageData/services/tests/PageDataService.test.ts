@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { first, skip, take, tap } from 'rxjs/operators';
+import { skip, take, tap } from 'rxjs/operators';
 import { HttpService } from '../HttpService';
 import { ListsService } from '../ListsService';
 import { PageDataService } from '../PageDataService';
@@ -12,8 +12,9 @@ describe('Page Data', () => {
   let listsService: ListsService;
   let dataService: PageDataService;
   let httpSpy: jest.SpyInstance;
+  let count = 0;
 
-  beforeEach(() => {
+  beforeAll(() => {
     httpService = new HttpService();
     pagesService = new PagesService(httpService);
     listsService = new ListsService(httpService);
@@ -26,6 +27,13 @@ describe('Page Data', () => {
       if (path.startsWith('nextListUrl')) {
         return of(testData.list1WithItems);
       }
+      console.log(path);
+
+      if (
+        path.includes(`path=${encodeURIComponent(testData.pageDataOther.path)}`)
+      ) {
+        return of(testData.pageDataOther);
+      }
 
       return of(testData.pageData);
     });
@@ -34,15 +42,23 @@ describe('Page Data', () => {
   describe('Pages', () => {
     fit('should return page data from http', done => {
       dataService.pageData$
-        .pipe(first(pageData => !!pageData.pageEntry))
+        // .pipe(first(pageData => !!pageData.pageEntry))
+        .pipe(
+          tap(d => console.log(d)),
+          tap(() => count++)
+        )
         .subscribe(val => {
-          console.log(val);
+          if (count === 3) {
+            dataService.getPageData(testData.pageDataOther.path);
+          }
 
           // expect(val).toEqual(testData.pageData);
           done();
+          // count++;
         });
 
-      dataService.getPageData('/');
+      dataService.getPageData(testData.pageData.path);
+
       // dataService.getPageData('/other');
       // dataService.getPageData('/');
     });

@@ -37,6 +37,18 @@ const entry2: Entry = {
   list: list2WithItems
 };
 
+export const pageDataOther: PageEntry = {
+  id: 'string',
+  isStatic: false,
+  isSystemPage: false,
+  metadata: {},
+  key: 'string',
+  path: '/other',
+  template: 'string',
+  title: 'string',
+  entries: [entry, entry2]
+};
+
 export const pageData: PageEntry = {
   id: 'string',
   isStatic: false,

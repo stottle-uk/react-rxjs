@@ -58,5 +58,7 @@ export default OtherPage;
 
 const pageEntries: { [hey: string]: ComponentType<List> } = {
   P2: P2PageEntry,
+  H7: P2PageEntry,
+  D6: P2PageEntry,
   CS5: CS5TemplateEntry
 };

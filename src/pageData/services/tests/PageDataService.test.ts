@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { skip, take, tap } from 'rxjs/operators';
+import { first, skip, take, tap } from 'rxjs/operators';
 import { HttpService } from '../HttpService';
 import { ListsService } from '../ListsService';
 import { PageDataService } from '../PageDataService';
@@ -33,12 +33,14 @@ describe('Page Data', () => {
 
   describe('Pages', () => {
     fit('should return page data from http', done => {
-      dataService.pageData$.subscribe(val => {
-        console.log(val);
+      dataService.pageData$
+        .pipe(first(pageData => !!pageData.pageEntry))
+        .subscribe(val => {
+          console.log(val);
 
-        // expect(val).toEqual(testData.pageData);
-        done();
-      });
+          // expect(val).toEqual(testData.pageData);
+          done();
+        });
 
       dataService.getPageData('/');
       // dataService.getPageData('/other');

@@ -78,7 +78,7 @@ export class PageDataService {
     const entryLists = pageEntry.entries
       ? pageEntry.entries
           .filter(e => e.list)
-          .filter(e => +e.list.id > 0)
+          .filter(e => e.type !== 'UserEntry')
           .map(e => e.list)
       : [];
 

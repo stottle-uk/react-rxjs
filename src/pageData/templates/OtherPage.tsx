@@ -1,26 +1,14 @@
-import React, { ComponentType } from 'react';
+import React from 'react';
 import {
   Dictionary,
   List,
   PageEntry,
   PageTemplateData
 } from '../models/pageEntry';
-import CS5TemplateEntry from '../templateEntries/CS5TemplateEntry';
-import P2PageEntry from '../templateEntries/P2TemplateEntry';
+import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 
 class OtherPage extends React.Component<PageTemplateData, any> {
-  componentDidMount(): void {
-    console.log(this.props);
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<PageTemplateData>,
-    prevState: Readonly<any>
-  ): void {
-    console.log(this.props);
-  }
-
   render() {
     const { pageEntry, lists } = this.props;
 
@@ -37,7 +25,7 @@ class OtherPage extends React.Component<PageTemplateData, any> {
     lists: Dictionary<List>
   ): JSX.Element[] {
     return page.entries.map(entry => {
-      const Template = pageEntries[entry.template];
+      const Template = pageTemplateEntries[entry.template];
       const list = entry.type === 'ListDetailEntry' ? page.list : entry.list;
 
       if (list) {
@@ -55,10 +43,3 @@ class OtherPage extends React.Component<PageTemplateData, any> {
 }
 
 export default OtherPage;
-
-const pageEntries: { [hey: string]: ComponentType<List> } = {
-  P2: P2PageEntry,
-  H7: P2PageEntry,
-  D6: P2PageEntry,
-  CS5: CS5TemplateEntry
-};

@@ -14,11 +14,12 @@ class P2PageEntry extends React.PureComponent<List> {
           </Link>
         </h1>
 
-        <GetMore className="test" page={this.props.paging}>
-          More
-        </GetMore>
-
-        <div className="list-row">{this.renderList(this.props.items)}</div>
+        <div className="list-row">
+          {this.renderList(this.props.items)}{' '}
+          <GetMore className="test" page={this.props.paging}>
+            More
+          </GetMore>
+        </div>
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );

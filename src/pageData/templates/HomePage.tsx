@@ -1,20 +1,9 @@
-import React, { Component, ComponentType } from 'react';
+import React, { Component } from 'react';
 import { Dictionary, Entry, List, PageTemplateData } from '../models/pageEntry';
-import P2PageEntry from '../templateEntries/P2TemplateEntry';
+import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 
 class HomePage extends Component<PageTemplateData, any> {
-  componentDidMount(): void {
-    console.log(this.props);
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<PageTemplateData>,
-    prevState: Readonly<any>
-  ): void {
-    // console.log(this.props);
-  }
-
   render() {
     const { pageEntry, lists } = this.props;
 
@@ -33,7 +22,7 @@ class HomePage extends Component<PageTemplateData, any> {
   ): JSX.Element[] {
     return entries.map(entry => {
       if (entry.type === 'ListEntry') {
-        const Template = pageEntries[entry.template];
+        const Template = pageTemplateEntries[entry.template];
         const list = lists[entry.list.id];
 
         return (
@@ -48,10 +37,3 @@ class HomePage extends Component<PageTemplateData, any> {
 }
 
 export default HomePage;
-
-const pageEntries: { [hey: string]: ComponentType<List> } = {
-  P2: P2PageEntry,
-  H7: P2PageEntry,
-  '2:3 Poster (Standard)': P2PageEntry,
-  '2:3 Poster (Block Hero)': P2PageEntry
-};

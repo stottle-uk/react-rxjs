@@ -1,7 +1,9 @@
 import {
   combineLatest,
   from,
+  iif,
   Observable,
+  of,
   OperatorFunction,
   Subject
 } from 'rxjs';
@@ -57,15 +59,22 @@ export class PageDataService {
     return source =>
       source.pipe(
         switchMap(page =>
-          this.getLists(page).pipe(
-            tap(list => this.lists.queueList(list)),
+          of(page).pipe(
+            map(page => this.getLists(page)),
+            switchMap(lists =>
+              iif(
+                () => !!lists.length,
+                from(lists).pipe(tap(list => this.lists.queueList(list))),
+                of({})
+              )
+            ),
             map(() => page)
           )
         )
       );
   }
 
-  private getLists(pageEntry: PageEntry): Observable<List> {
+  private getLists(pageEntry: PageEntry): List[] {
     const entryLists = pageEntry.entries
       ? pageEntry.entries
           .filter(e => e.list)
@@ -78,6 +87,6 @@ export class PageDataService {
         ? [pageEntry.list, ...entryLists]
         : entryLists;
 
-    return from(lists);
+    return lists;
   }
 }

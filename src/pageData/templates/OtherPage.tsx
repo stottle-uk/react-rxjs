@@ -18,7 +18,7 @@ class OtherPage extends React.Component<PageTemplateData, any> {
     prevProps: Readonly<PageTemplateData>,
     prevState: Readonly<any>
   ): void {
-    // console.log(this.props);
+    console.log(this.props);
   }
 
   render() {
@@ -26,7 +26,7 @@ class OtherPage extends React.Component<PageTemplateData, any> {
 
     return (
       <div>
-        {pageEntry && this.renderEntries(pageEntry, lists)}
+        {pageEntry && pageEntry.entries && this.renderEntries(pageEntry, lists)}
         {/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}
       </div>
     );
@@ -49,7 +49,7 @@ class OtherPage extends React.Component<PageTemplateData, any> {
           </div>
         );
       }
-      return <span />;
+      return <span key={entry.id} />;
     });
   }
 }

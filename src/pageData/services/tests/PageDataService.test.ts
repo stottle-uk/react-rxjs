@@ -32,6 +32,17 @@ describe('Page Data', () => {
   });
 
   describe('Pages', () => {
+    fit('should return page data from http', done => {
+      dataService.pageData$.subscribe(val => {
+        console.log(val);
+
+        // expect(val).toEqual(testData.pageData);
+        // done();
+      });
+
+      dataService.getPageData('/');
+    });
+
     it('should return page data from http', done => {
       dataService.currentPage$.subscribe(val => {
         expect(val).toEqual(testData.pageData);

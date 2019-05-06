@@ -13,6 +13,7 @@ import {
   map,
   mergeMap,
   scan,
+  startWith,
   switchMap,
   tap,
   withLatestFrom
@@ -75,7 +76,8 @@ export class ListsService {
         }),
         {} as Dictionary<List>
       ),
-      tap(cache => this.innerCache$.next(cache))
+      tap(cache => this.innerCache$.next(cache)),
+      startWith({})
     );
   }
 

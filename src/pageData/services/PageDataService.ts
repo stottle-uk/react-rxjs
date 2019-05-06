@@ -1,6 +1,18 @@
-import { from, Observable, OperatorFunction, Subject } from 'rxjs';
+import {
+  combineLatest,
+  from,
+  Observable,
+  OperatorFunction,
+  Subject
+} from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { Dictionary, List, PageEntry, Paging } from '../models/pageEntry';
+import {
+  Dictionary,
+  List,
+  PageEntry,
+  PageTemplateData,
+  Paging
+} from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
@@ -20,6 +32,15 @@ export class PageDataService {
 
   get lists$(): Observable<Dictionary<List>> {
     return this.lists.lists$;
+  }
+
+  get pageData$(): Observable<PageTemplateData> {
+    return combineLatest(this.currentPage$, this.lists$).pipe(
+      map(([pageEntry, lists]) => ({
+        pageEntry,
+        lists
+      }))
+    );
   }
 
   constructor(private pages: PagesService, private lists: ListsService) {}

@@ -1,10 +1,9 @@
 import {
   BehaviorSubject,
-  empty,
   from,
-  iif,
   merge,
   Observable,
+  OperatorFunction,
   Subject
 } from 'rxjs';
 import {
@@ -23,68 +22,49 @@ import { HttpService } from './HttpService';
 
 export class ListsService {
   private innerCurrentList$ = new Subject<List>();
+  private innerListQueue$ = new Subject<List>();
   private innerPaging$ = new Subject<Paging>();
   private innerCache$ = new BehaviorSubject<Dictionary<List>>({});
 
-  get currentList$(): Observable<List> {
+  private get listNotInCache$(): Observable<List> {
     return this.innerCurrentList$.asObservable().pipe(
       withLatestFrom(this.innerCache$),
       filter(([list, cache]) => !cache[list.id]),
-      map(([list, cache]) => list)
+      map(([list]) => list),
+      tap(list => this.innerListQueue$.next(list))
     );
   }
 
-  get moreLists$(): Observable<List> {
+  private get listQueue$(): Observable<List> {
+    return this.innerListQueue$
+      .asObservable()
+      .pipe(filter(list => !list.items.length));
+  }
+
+  private get httpLists$(): Observable<List> {
+    return this.listQueue$.pipe(
+      bufferTime(200, null, 5),
+      filter(lists => !!lists.length),
+      map(lists => this.buildListUri(lists.map(l => l.id))),
+      mergeMap(uri =>
+        this.httpService.get<List[]>(uri).pipe(switchMap(lists => from(lists)))
+      )
+    );
+  }
+
+  private get moreLists$(): Observable<List> {
     return this.innerPaging$.pipe(
       map(paging => paging.next),
       filter(next => !!next),
       distinctUntilChanged(),
       map(paging => `${paging}`),
-      switchMap(nextUrl =>
-        this.httpService.get<List>(nextUrl).pipe(
-          withLatestFrom(this.innerCache$),
-          // tap(d => console.log(d)),
-          map(([list, cache]) => ({
-            ...cache[list.id],
-            ...list,
-            items: [...cache[list.id].items, ...list.items]
-          }))
-        )
-      )
+      switchMap(nextUrl => this.httpService.get<List>(nextUrl))
     );
   }
 
-  get httpLists$(): Observable<List> {
-    return this.innerCurrentList$.pipe(
-      filter(list => !list.items.length),
-      withLatestFrom(this.innerCache$),
-      filter(([list, cache]) => cache[list.id] && !cache[list.id].items.length),
-      map(([list, cache]) => list),
-      bufferTime(0, null, 5),
-      // tap(d => console.log(d)),
-      mergeMap(lists =>
-        iif(
-          () => !!lists.length,
-          this.httpService
-            .get<List[]>(this.buildListUri(lists.map(list => list.id)))
-            .pipe(switchMap(lists => from(lists))),
-          empty()
-        )
-      )
-    );
-  }
-
-  get listsCache$(): Observable<Dictionary<List>> {
-    return merge(
-      this.innerCurrentList$.pipe(
-        withLatestFrom(this.innerCache$),
-        // tap(d => console.log(d)),
-        filter(([list, cache]) => !cache[list.id]),
-        map(([list, cache]) => list)
-      ),
-      this.httpLists$,
-      this.moreLists$
-    ).pipe(
+  get lists$(): Observable<Dictionary<List>> {
+    return merge(this.listNotInCache$, this.httpLists$, this.moreLists$).pipe(
+      this.appendListFromCache(),
       map(list => ({
         [list.id]: list
       })),
@@ -94,12 +74,9 @@ export class ListsService {
           ...curr
         }),
         {} as Dictionary<List>
-      )
+      ),
+      tap(cache => this.innerCache$.next(cache))
     );
-  }
-
-  get lists$(): Observable<Dictionary<List>> {
-    return this.listsCache$.pipe(tap(cache => this.innerCache$.next(cache)));
   }
 
   constructor(private httpService: HttpService) {}
@@ -110,6 +87,22 @@ export class ListsService {
 
   getMore(paging: Paging): void {
     this.innerPaging$.next(paging);
+  }
+
+  private appendListFromCache(): OperatorFunction<List, List> {
+    return source =>
+      source.pipe(
+        withLatestFrom(this.innerCache$),
+        map(([list, cache]) =>
+          cache[list.id]
+            ? {
+                ...cache[list.id],
+                ...list,
+                items: [...cache[list.id].items, ...list.items]
+              }
+            : list
+        )
+      );
   }
 
   private buildListUri(listIds: string[]): string {

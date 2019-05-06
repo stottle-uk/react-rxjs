@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { combineLatest, interval } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import './App.css';
 import { Sitemap } from './pageData/models/config';
 import { PageEntry, PageTemplateData } from './pageData/models/pageEntry';
@@ -41,32 +40,13 @@ class App extends Component<AppProps, AppState> {
       )
       .subscribe();
 
-    combineLatest(dataService.currentPage$, dataService.lists$)
+    dataService.pageData$
       .pipe(
-        map(([pageEntry, lists]) => {
-          return {
-            pageEntry,
-            lists
-          };
-        }),
         tap(pageData =>
           this.setState({
             pageData
           })
         )
-      )
-      .subscribe();
-
-    // this.testMe();
-  }
-
-  private testMe() {
-    const timer1$ = interval(1000).pipe(map(count => `timer 1 - ${count}`));
-    const timer2$ = interval(2000).pipe(map(count => `timer 2 - ${count}`));
-    combineLatest(timer1$, timer2$)
-      .pipe(
-        take(12),
-        tap(console.log)
       )
       .subscribe();
   }
@@ -87,10 +67,6 @@ class App extends Component<AppProps, AppState> {
       routeName: route.path
     });
   }
-
-  // private getRouteData(path: string): Observable<PageTemplateData> {
-  //   return dataService.getPageData(path);
-  // }
 
   render() {
     return (

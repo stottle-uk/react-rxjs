@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
-import { PageEntry } from '../models/pageEntry';
+import { Dictionary, PageEntry } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 
 export class PagesService {
-  private pagesCache: { [key: string]: Observable<PageEntry> } = {};
+  private pagesCache: Dictionary<Observable<PageEntry>> = {};
 
   constructor(private httpService: HttpService) {}
 

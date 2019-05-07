@@ -2,11 +2,11 @@ import { RouterConfigRoute } from '../types/router';
 
 export class RouteMatcher<T> {
   matchRoute(
-    routes: RouterConfigRoute<T>[],
     path: string,
+    routes: RouterConfigRoute<T>[],
     deafultRoute: RouterConfigRoute<T>
   ): RouterConfigRoute<T> {
-    const route = routes.find(r => this.findRoute(r, path)) || deafultRoute;
+    const route = routes.find(r => this.findRoute(path, r)) || deafultRoute;
 
     if (path.startsWith('/filme/') || path.startsWith('/playlist/')) {
       return {
@@ -17,7 +17,7 @@ export class RouteMatcher<T> {
     return route;
   }
 
-  private findRoute(route: RouterConfigRoute<T>, path: string): boolean {
+  private findRoute(path: string, route: RouterConfigRoute<T>): boolean {
     if (path.startsWith('/filme/') && route.path.startsWith('/filme/')) {
       return true;
     }

@@ -4,6 +4,7 @@ import { map, takeUntil, tap } from 'rxjs/operators';
 import './App.css';
 import { Sitemap } from './pageData/models/config';
 import { PageTemplateData } from './pageData/models/pageEntry';
+import Page from './pageData/Page';
 import {
   configService,
   pagesDataService,
@@ -12,7 +13,6 @@ import {
 import { pageEntries } from './pageData/pageEntries';
 import Link from './router/Link';
 import Router from './router/Router';
-import RouterOutlet from './router/RouterOutlet';
 import { RouterConfigRoute } from './router/types/router';
 
 export interface AppProps {}
@@ -33,17 +33,6 @@ class App extends Component<AppProps, AppState> {
         map(config => config.sitemap),
         map(sitemap => this.mapSitemapToRoute(sitemap)),
         tap(routes => router.addRoutes(routes))
-      )
-      .subscribe();
-
-    pagesDataService.pageData$
-      .pipe(
-        takeUntil(this.destory$),
-        tap(pageData =>
-          this.setState({
-            pageData
-          })
-        )
       )
       .subscribe();
   }
@@ -72,17 +61,9 @@ class App extends Component<AppProps, AppState> {
       <div className="App">
         <Router router={router} onRouteChange={this.onRouteChange.bind(this)}>
           {this.renderHeader()}
-          {this.renderBody()}
+          <Page />
         </Router>
       </div>
-    );
-  }
-
-  private renderBody(): React.ReactNode {
-    return this.state && this.state.pageData && !this.state.pageData.loading ? (
-      <RouterOutlet data={this.state.pageData} />
-    ) : (
-      <div>loading!!!</div>
     );
   }
 

@@ -1,10 +1,7 @@
 import {
   BehaviorSubject,
   combineLatest,
-  from,
-  iif,
   Observable,
-  of,
   OperatorFunction,
   Subject
 } from 'rxjs';
@@ -67,18 +64,8 @@ export class PageDataService {
   private queueLists(): OperatorFunction<PageEntry, PageEntry> {
     return source =>
       source.pipe(
-        switchMap(page =>
-          of(page).pipe(
-            map(page => this.getLists(page)),
-            switchMap(lists =>
-              iif(
-                () => !!lists.length,
-                from(lists).pipe(tap(list => this.lists.queueList(list))),
-                of({})
-              )
-            ),
-            map(() => page)
-          )
+        tap(page =>
+          this.getLists(page).forEach(list => this.lists.queueList(list))
         )
       );
   }

@@ -1,13 +1,15 @@
-import { BehaviorSubject, fromEvent, merge, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subject } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { RouterConfig, RouterConfigRoute } from '../types/router';
 import { RouteMatcher } from './RouteMatcher';
 
 export class BrowserRouter<T> {
-  private innerPath$ = new BehaviorSubject<string>(this.getLocationPath());
+  private pushedPath$ = new Subject<string>();
 
-  private get path$(): Observable<string> {
-    return this.innerPath$.asObservable();
+  private get onPushState$(): Observable<string> {
+    return this.pushedPath$
+      .asObservable()
+      .pipe(startWith(this.getLocationPath()));
   }
 
   private get onPopState$(): Observable<string> {
@@ -17,7 +19,7 @@ export class BrowserRouter<T> {
   }
 
   get activedRoute$(): Observable<RouterConfigRoute<T>> {
-    return merge(this.onPopState$, this.path$).pipe(
+    return merge(this.onPopState$, this.onPushState$).pipe(
       map(path =>
         this.routerMatcher.matchRoute(
           path,
@@ -52,7 +54,7 @@ export class BrowserRouter<T> {
   }
 
   private nextRoute(location: string): void {
-    this.innerPath$.next(location);
+    this.pushedPath$.next(location);
   }
 
   private getLocationPath(): string {

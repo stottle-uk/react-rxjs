@@ -10,7 +10,7 @@ class P2PageEntry extends React.PureComponent<List> {
       <div>
         <h1>
           <Link to={this.props.path}>
-            {this.props.title} <small>{this.props.id}</small>{' '}
+            {this.props.title} <small>{this.props.id}</small>
           </Link>
         </h1>
 

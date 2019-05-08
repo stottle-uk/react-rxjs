@@ -14,7 +14,7 @@
     "typescript": "3.4.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "open -a Google\\ Chrome --args --disable-web-security --user-data-dir && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

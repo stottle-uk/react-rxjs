@@ -1,0 +1,36 @@
+.product-card {
+  width: 100%;
+  box-sizing: border-box;
+  user-select: none;
+}
+.product-card__poster {
+  position: relative;
+  width: 100%;
+  padding-bottom: 50%;
+  font-size: 0;
+  overflow: hidden;
+}
+.product-card__image {
+  position: absolute;
+  width: 100%;
+}
+
+.swiper {
+  overflow: hidden;
+  margin-top: 10px;
+  max-width: 640px;
+}
+.swiper__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+  font-size: 0;
+  overflow: visible;
+}
+.swiper__item {
+  width: 100%;
+  padding: 0;
+  display: inline-block;
+  box-sizing: border-box;
+}

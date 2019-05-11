@@ -49,7 +49,7 @@ export interface Classification {
 }
 
 export interface Item {
-  images?: Images;
+  images: Images;
   duration?: number;
   releaseYear?: number;
   offers?: Offer[];

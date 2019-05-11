@@ -1,28 +1,96 @@
-import React from 'react';
-import { interval } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
-import { Item } from '../../pageData/models/pageEntry';
-import './HeroStandard3x1.css';
+import React, { CSSProperties } from 'react';
+import { interval, Observable, Subject } from 'rxjs';
+import { filter, map, scan, takeUntil, tap } from 'rxjs/operators';
 
-class Carousel extends React.PureComponent<Item[]> {
-  swiperEl: HTMLDivElement;
+interface Props extends React.HTMLProps<HTMLDivElement> {}
 
-  onSwiper(el: HTMLDivElement) {
-    const t = window.getComputedStyle(el);
-    console.log(t);
+interface State {
+  count: number;
+  mouseOver: boolean;
+  listStyle: CSSProperties;
+  swiper: HTMLDivElement;
+}
+
+class Carousel extends React.Component<Props, State> {
+  destroy$ = new Subject();
+  state: State = {
+    ...this.state,
+    count: 0,
+    mouseOver: false,
+    listStyle: {
+      transform: 'translate3d(0px, 0, 0)',
+      transition: 'transform 1s',
+      whiteSpace: 'nowrap',
+      overflow: 'visible'
+    }
+  };
+
+  get carouselTimer$(): Observable<{}> {
+    return interval(2000).pipe(
+      filter(() => !this.state.mouseOver),
+      scan(acc => (acc === this.state.count - 1 ? 0 : acc + 1), 0),
+      map(count => this.getWidth(count)),
+      tap(width => this.translateX(width))
+    );
   }
 
   componentDidMount(): void {
-    interval(500)
-      .pipe(
-        take(20),
-        tap(console.log)
-      )
-      .subscribe();
+    this.setState({
+      count: React.Children.count(this.props.children)
+    });
+    this.carouselTimer$.pipe(takeUntil(this.destroy$)).subscribe();
   }
 
+  componentWillUnmount(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private translateX = (width: number): void => {
+    this.setState({
+      listStyle: {
+        ...this.state.listStyle,
+        transform: `translate3d(${width}px, 0, 0)`
+      }
+    });
+  };
+
+  private getWidth = (count: number): number => {
+    return -(
+      count *
+      parseInt(window.getComputedStyle(this.state.swiper).width as string, 10)
+    );
+  };
+
+  private onListMouseEnter = (): void => {
+    this.setState({
+      mouseOver: true
+    });
+  };
+
+  private onListMouseLeave = (): void => {
+    this.setState({
+      mouseOver: false
+    });
+  };
+
+  private onSwiperRef = (ref: HTMLDivElement): void => {
+    this.setState({
+      swiper: ref
+    });
+  };
+
   render() {
-    return <div>{/* <pre>{JSON.stringify(this.props, null, 2)}</pre> */}</div>;
+    return (
+      <div
+        className={this.props.className}
+        ref={this.onSwiperRef}
+        onMouseEnter={this.onListMouseEnter}
+        onMouseLeave={this.onListMouseLeave}
+      >
+        <div style={this.state.listStyle}>{this.props.children}</div>
+      </div>
+    );
   }
 }
 

@@ -1,7 +1,8 @@
 import { Entry, Item, List, PageEntry, Paging } from '../../models/pageEntry';
 
 const item: Item = {
-  path: 'path'
+  path: 'path',
+  images: {}
 };
 export const list1: List = {
   id: '1234',

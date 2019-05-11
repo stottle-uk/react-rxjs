@@ -13,24 +13,22 @@ class HeroStandard3x1 extends React.PureComponent<List> {
             {this.props.title} <small>{this.props.id}</small>
           </Link>
         </h1>
-        <Carousel className="swiper">
-          {this.renderList(this.props.items)}
+        <Carousel className="swiper" useRx={true} interval={2000}>
+          {this.renderCarouselItems(this.props.items)}
         </Carousel>
       </div>
     );
   }
 
-  private renderList(items: Item[]): React.ReactNodeArray {
-    return (
-      items &&
-      items.map(item => (
-        <div
-          className="swiper__item"
-          key={item.id}
-          style={this.setImage(item)}
-        />
-      ))
-    );
+  private renderCarouselItems(items: Item[]): React.ReactNodeArray {
+    return items.map(item => (
+      <div className="swiper__item" key={item.id} style={this.setImage(item)}>
+        <div className="item__title">
+          <Link to={item.path}>{item.title}</Link>
+          <p>{item.tagline}</p>
+        </div>
+      </div>
+    ));
   }
 
   private setImage = (item: Item) => ({

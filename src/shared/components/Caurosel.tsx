@@ -2,18 +2,22 @@ import React, { CSSProperties } from 'react';
 import { interval, Observable, Subject } from 'rxjs';
 import { filter, map, scan, takeUntil, tap } from 'rxjs/operators';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+interface CarouselProps extends React.HTMLProps<HTMLDivElement> {
+  useRx: boolean;
+  interval: number;
+}
 
-interface State {
+interface CarouselState {
   count: number;
   mouseOver: boolean;
   listStyle: CSSProperties;
   swiper: HTMLDivElement;
 }
 
-class Carousel extends React.Component<Props, State> {
+class Carousel extends React.Component<CarouselProps, CarouselState> {
+  interval!: NodeJS.Timeout;
   destroy$ = new Subject();
-  state: State = {
+  state: CarouselState = {
     ...this.state,
     count: 0,
     mouseOver: false,
@@ -25,8 +29,8 @@ class Carousel extends React.Component<Props, State> {
     }
   };
 
-  get carouselTimer$(): Observable<{}> {
-    return interval(2000).pipe(
+  get carouselInterval$(): Observable<{}> {
+    return interval(this.props.interval).pipe(
       filter(() => !this.state.mouseOver),
       scan(acc => (acc === this.state.count - 1 ? 0 : acc + 1), 0),
       map(count => this.getWidth(count)),
@@ -35,15 +39,35 @@ class Carousel extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
+    const { children, interval, useRx } = this.props;
+
     this.setState({
-      count: React.Children.count(this.props.children)
+      count: React.Children.count(children)
     });
-    this.carouselTimer$.pipe(takeUntil(this.destroy$)).subscribe();
+
+    if (useRx) {
+      this.carouselInterval$.pipe(takeUntil(this.destroy$)).subscribe();
+    } else {
+      this.interval = setInterval(this.runCarouselInterval(), interval);
+    }
   }
 
   componentWillUnmount(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    clearInterval(this.interval);
+  }
+
+  private runCarouselInterval(): () => number {
+    let acc = 0;
+    return () => {
+      if (!this.state.mouseOver) {
+        acc = acc === this.state.count - 1 ? 0 : acc + 1;
+        const width = this.getWidth(acc);
+        this.translateX(width);
+      }
+      return acc;
+    };
   }
 
   private translateX = (width: number): void => {
@@ -81,14 +105,16 @@ class Carousel extends React.Component<Props, State> {
   };
 
   render() {
+    const { className, children } = this.props;
+
     return (
       <div
-        className={this.props.className}
+        className={className}
         ref={this.onSwiperRef}
         onMouseEnter={this.onListMouseEnter}
         onMouseLeave={this.onListMouseLeave}
       >
-        <div style={this.state.listStyle}>{this.props.children}</div>
+        <div style={this.state.listStyle}>{children}</div>
       </div>
     );
   }

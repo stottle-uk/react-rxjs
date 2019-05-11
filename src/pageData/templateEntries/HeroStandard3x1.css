@@ -2,6 +2,7 @@
   overflow: hidden;
   width: 100%;
 }
+
 .swiper__item {
   width: 100%;
   padding-bottom: 40%;
@@ -10,4 +11,13 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  position: relative;
+}
+
+.item__title {
+  position: absolute;
+  top: 70%;
+  left: 20px;
+  color: #fff;
+  max-width: 30%;
 }

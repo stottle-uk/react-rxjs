@@ -5,12 +5,9 @@ import App from './App';
 import './index.css';
 import { Sitemap } from './pageData/models/config';
 import { PageTemplateData } from './pageData/models/pageEntry';
-import {
-  browserHistroy,
-  configService,
-  router
-} from './pageData/pageDataServices';
+import { configService, router } from './pageData/pageDataServices';
 import { pageEntries } from './pageData/pageEntries';
+import { browserHistory } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';
 
@@ -22,7 +19,7 @@ function gfgffg(): void {
       map(config => config.sitemap),
       map(sitemap => mapSitemapToRoute(sitemap)),
       tap(routes => router.addRoutes(routes)),
-      tap(() => browserHistroy.refresh())
+      tap(() => browserHistory.refresh())
     )
     .subscribe();
 }

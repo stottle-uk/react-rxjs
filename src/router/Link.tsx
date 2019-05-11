@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouterConsumer } from './RouterContext';
+import { HistoryConsumer } from './RouterContext';
 
 export interface LinkProps {
   to: string;
@@ -17,15 +17,15 @@ class Link extends React.PureComponent<LinkProps> {
   render() {
     const { to, ...rest } = this.props;
     return (
-      <RouterConsumer>
-        {({ router }) => (
+      <HistoryConsumer>
+        {({ history }) => (
           <a
             {...rest}
-            onClick={event => this.handleClick(event, router.go.bind(router))}
+            onClick={event => this.handleClick(event, history.go.bind(history))}
             href={to}
           />
         )}
-      </RouterConsumer>
+      </HistoryConsumer>
     );
   }
 }

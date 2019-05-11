@@ -2,11 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import Page from './pageData/Page';
-import {
-  browserHistroy,
-  pagesDataService,
-  router
-} from './pageData/pageDataServices';
+import { pagesDataService, router } from './pageData/pageDataServices';
 import Link from './router/Link';
 import Router from './router/Router';
 import { RouterConfigRoute } from './router/types/router';
@@ -26,11 +22,7 @@ class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <Router
-          history={browserHistroy}
-          router={router}
-          onRouteFound={this.onRouteChange.bind(this)}
-        >
+        <Router router={router} onRouteFound={this.onRouteChange.bind(this)}>
           {this.renderHeader()}
           <Page />
         </Router>

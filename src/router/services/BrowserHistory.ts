@@ -22,9 +22,9 @@ export class BrowserHistory {
 
   go(location: string, replace = false): void {
     if (replace) {
-      this.replaceState(location);
+      history.replaceState({}, window.document.title, location);
     } else {
-      this.pushState(location);
+      history.pushState({}, window.document.title, location);
     }
     this.innerPushedPath$.next(location);
   }
@@ -43,13 +43,5 @@ export class BrowserHistory {
 
   private getLocationPath(): string {
     return window.location.pathname + window.location.search;
-  }
-
-  private replaceState(location: string): void {
-    history.replaceState({}, window.document.title, location);
-  }
-
-  private pushState(location: string): void {
-    history.pushState({}, window.document.title, location);
   }
 }

@@ -12,13 +12,15 @@ const routerOutletContext = React.createContext<RouterOutletContext>({
 export const RouterOutletProvider = routerOutletContext.Provider;
 export const RouterOutletConsumer = routerOutletContext.Consumer;
 
-export interface RouterContext {
-  router: BrowserHistory;
+export interface HistoryContext {
+  history: BrowserHistory;
 }
 
-const routerContext = React.createContext<RouterContext>({
-  router: new BrowserHistory()
+export const browserHistory = new BrowserHistory();
+
+const historyContext = React.createContext<HistoryContext>({
+  history: browserHistory
 });
 
-export const RouterProvider = routerContext.Provider;
-export const RouterConsumer = routerContext.Consumer;
+export const HistoryProvider = historyContext.Provider;
+export const HistoryConsumer = historyContext.Consumer;

@@ -18,10 +18,10 @@ class Link extends React.PureComponent<LinkProps> {
     const { to, ...rest } = this.props;
     return (
       <RouterConsumer>
-        {({ go }) => (
+        {({ router }) => (
           <a
             {...rest}
-            onClick={event => this.handleClick(event, go)}
+            onClick={event => this.handleClick(event, router.go.bind(router))}
             href={to}
           />
         )}

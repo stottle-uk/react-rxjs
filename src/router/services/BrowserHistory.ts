@@ -14,7 +14,7 @@ export class BrowserHistory {
     );
   }
 
-  get activedPath$(): Observable<string> {
+  get activatedPath$(): Observable<string> {
     return merge(this.onPopState$, this.onPushState$).pipe(
       startWith(this.getLocationPath())
     );
@@ -22,11 +22,15 @@ export class BrowserHistory {
 
   go(location: string, replace = false): void {
     if (replace) {
-      history.replaceState({}, window.document.title, location);
+      this.replaceState(location);
     } else {
-      history.pushState({}, window.document.title, location);
+      this.pushState(location);
     }
     this.innerPushedPath$.next(location);
+  }
+
+  refresh(): void {
+    this.go(this.getLocationPath(), true);
   }
 
   forward(): void {
@@ -39,5 +43,13 @@ export class BrowserHistory {
 
   private getLocationPath(): string {
     return window.location.pathname + window.location.search;
+  }
+
+  private replaceState(location: string): void {
+    history.replaceState({}, window.document.title, location);
+  }
+
+  private pushState(location: string): void {
+    history.pushState({}, window.document.title, location);
   }
 }

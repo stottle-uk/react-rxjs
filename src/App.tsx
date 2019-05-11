@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import Page from './pageData/Page';
-import { pagesDataService, router } from './pageData/pageDataServices';
+import {
+  browserHistroy,
+  pagesDataService,
+  router
+} from './pageData/pageDataServices';
 import Link from './router/Link';
 import Router from './router/Router';
 import { RouterConfigRoute } from './router/types/router';
@@ -15,10 +19,6 @@ interface AppState {
 }
 
 class App extends Component<AppProps, AppState> {
-  componentDidMount(): void {}
-
-  componentWillUnmount(): void {}
-
   private onRouteChange(route: RouterConfigRoute<PageTemplateData>): void {
     pagesDataService.getPageData(route.path);
   }
@@ -26,7 +26,11 @@ class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <Router router={router} onRouteChange={this.onRouteChange.bind(this)}>
+        <Router
+          history={browserHistroy}
+          router={router}
+          onRouteFound={this.onRouteChange.bind(this)}
+        >
           {this.renderHeader()}
           <Page />
         </Router>

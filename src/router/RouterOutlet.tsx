@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouterConsumer } from './RouterContext';
+import { RouterOutletConsumer } from './RouterContext';
 
 export interface RouterOutletProps<T> {
   data: T;
@@ -8,9 +8,9 @@ export interface RouterOutletProps<T> {
 class RouterOutlet<T> extends React.PureComponent<RouterOutletProps<T>> {
   render() {
     return (
-      <RouterConsumer>
+      <RouterOutletConsumer>
         {context => <context.element {...this.props.data} />}
-      </RouterConsumer>
+      </RouterOutletConsumer>
     );
   }
 }

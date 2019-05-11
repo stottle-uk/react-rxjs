@@ -10,7 +10,7 @@ describe('Browser History', () => {
 
   describe('Pages', () => {
     fit('initial path should be current the current path', done => {
-      browserHistory.activedPath$.pipe(first()).subscribe(val => {
+      browserHistory.activatedPath$.pipe(first()).subscribe(val => {
         expect(val).toEqual('/');
         done();
       });
@@ -21,7 +21,7 @@ describe('Browser History', () => {
 
       browserHistory.go('/2');
 
-      browserHistory.activedPath$.subscribe(val => {
+      browserHistory.activatedPath$.subscribe(val => {
         console.log(val);
         done();
       });
@@ -32,7 +32,7 @@ describe('Browser History', () => {
 
       browserHistory.back();
 
-      browserHistory.activedPath$.subscribe(val => {
+      browserHistory.activatedPath$.subscribe(val => {
         console.log(val);
         done();
       });
@@ -43,7 +43,7 @@ describe('Browser History', () => {
 
       browserHistory.forward();
 
-      browserHistory.activedPath$.subscribe(val => {
+      browserHistory.activatedPath$.subscribe(val => {
         console.log(val);
         done();
       });

@@ -1,3 +1,4 @@
+import { browserHistory } from '../router/RouterContext';
 import { BrowserRouter } from '../router/services/BrowserRouter';
 import { RouteMatcher } from '../router/services/RouteMatcher';
 import { PageTemplateData } from './models/pageEntry';
@@ -12,7 +13,11 @@ export const httpService = new HttpService();
 export const configService = new ConfigService(httpService);
 export const pagesService = new PagesService(httpService);
 export const listsService = new ListsService(httpService);
-export const pagesDataService = new PageDataService(pagesService, listsService);
+export const pagesDataService = new PageDataService(
+  browserHistory,
+  pagesService,
+  listsService
+);
 
 export const routeMatcher = new RouteMatcher<PageTemplateData>();
 export const router = new BrowserRouter<PageTemplateData>(

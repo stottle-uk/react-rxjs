@@ -11,7 +11,7 @@ import { browserHistory } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';
 
-function gfgffg(): void {
+function getConfig(): void {
   configService
     .getConfig()
     .pipe(
@@ -24,7 +24,7 @@ function gfgffg(): void {
     .subscribe();
 }
 
-gfgffg();
+getConfig();
 
 function mapSitemapToRoute(
   sitemap: Sitemap[]

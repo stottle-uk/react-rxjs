@@ -65,7 +65,7 @@ export class ListsService {
 
   get lists$(): Observable<Dictionary<List>> {
     return merge(this.listNotInCache$, this.httpLists$, this.moreLists$).pipe(
-      this.appendListFromCache(),
+      this.concatListFromCache(),
       map(list => ({
         [list.id]: list
       })),
@@ -91,7 +91,7 @@ export class ListsService {
     this.innerPaging$.next(paging);
   }
 
-  private appendListFromCache(): OperatorFunction<List, List> {
+  private concatListFromCache(): OperatorFunction<List, List> {
     return source =>
       source.pipe(
         withLatestFrom(this.innerCache$),

@@ -18,7 +18,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs/operators';
-import { Dictionary, List, Paging } from '../models/pageEntry';
+import { Dictionary, Item, List, Paging } from '../models/pageEntry';
 import { HttpService } from './HttpService';
 
 export class ListsService {
@@ -100,11 +100,20 @@ export class ListsService {
             ? {
                 ...cache[list.id],
                 ...list,
-                items: [...cache[list.id].items, ...list.items]
+                items: this.concatAndRemoveDuplicates(cache, list)
               }
             : list
         )
       );
+  }
+
+  private concatAndRemoveDuplicates(
+    cache: Dictionary<List>,
+    list: List
+  ): Item[] {
+    return [...cache[list.id].items, ...list.items].filter(
+      (item, i, arr) => arr.findIndex(a => item.id === a.id) === i
+    );
   }
 
   private buildListUri(listIds: string[]): string {

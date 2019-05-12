@@ -1,18 +1,12 @@
 import React from 'react';
 import { RouterOutletConsumer } from './RouterContext';
 
-export interface RouterOutletProps<T> {
-  data: T;
-}
-
-class RouterOutlet<T> extends React.PureComponent<RouterOutletProps<T>> {
-  render() {
-    return (
-      <RouterOutletConsumer>
-        {context => <context.element {...this.props.data} />}
-      </RouterOutletConsumer>
-    );
-  }
-}
+const RouterOutlet = <T extends {}>(props: T) => {
+  return (
+    <RouterOutletConsumer>
+      {context => <context.element {...props} />}
+    </RouterOutletConsumer>
+  );
+};
 
 export default RouterOutlet;

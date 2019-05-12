@@ -34,7 +34,7 @@ class Page extends Component<PageProps, PageState> {
 
   render() {
     return this.state && this.state.pageData && !this.state.pageData.loading ? (
-      <RouterOutlet data={this.state.pageData} />
+      <RouterOutlet {...this.state.pageData} />
     ) : (
       <div>loading!!!</div>
     );

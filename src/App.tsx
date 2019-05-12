@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import { PageTemplateData } from './pageData/models/pageEntry';
-import Page from './pageData/Page';
 import { router } from './pageData/pageDataServices';
+import Page from './pages/Page';
 import Link from './router/Link';
 import Router from './router/Router';
 

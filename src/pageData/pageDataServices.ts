@@ -1,3 +1,4 @@
+import NotFound from '../pages/templates/NotFound';
 import { browserHistory } from '../router/RouterContext';
 import { BrowserRouter } from '../router/services/BrowserRouter';
 import { RouteMatcher } from '../router/services/RouteMatcher';
@@ -7,7 +8,6 @@ import { HttpService } from './services/HttpService';
 import { ListsService } from './services/ListsService';
 import { PageDataService } from './services/PageDataService';
 import { PagesService } from './services/PagesService';
-import NotFound from './templates/NotFound';
 
 export const httpService = new HttpService();
 export const configService = new ConfigService(httpService);

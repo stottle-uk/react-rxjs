@@ -6,7 +6,7 @@ import './index.css';
 import { Sitemap } from './pageData/models/config';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import { configService, router } from './pageData/pageDataServices';
-import { pageEntries } from './pageData/pageEntries';
+import { pageEntries } from './pages/pageEntries';
 import { browserHistory } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';

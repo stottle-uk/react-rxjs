@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
+import { PageTemplateData } from '../pageData/models/pageEntry';
+import { pagesDataService } from '../pageData/pageDataServices';
 import RouterOutlet from '../router/RouterOutlet';
-import { PageTemplateData } from './models/pageEntry';
-import { pagesDataService } from './pageDataServices';
 
 export interface PageProps {}
 

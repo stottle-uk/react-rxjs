@@ -1,5 +1,9 @@
 import { ComponentType } from 'react';
-import { Dictionary, List, PageTemplateData } from './models/pageEntry';
+import {
+  Dictionary,
+  List,
+  PageTemplateData
+} from '../pageData/models/pageEntry';
 import CS5TemplateEntry from './templateEntries/CS5TemplateEntry';
 import HeroStandard3x1 from './templateEntries/HeroStandard3x1';
 import P2PageEntry from './templateEntries/P2TemplateEntry';

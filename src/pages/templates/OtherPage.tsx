@@ -4,7 +4,7 @@ import {
   List,
   PageEntry,
   PageTemplateData
-} from '../models/pageEntry';
+} from '../../pageData/models/pageEntry';
 import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 

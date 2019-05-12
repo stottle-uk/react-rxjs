@@ -1,7 +1,7 @@
 import React from 'react';
+import { Item, List } from '../../pageData/models/pageEntry';
 import Link from '../../router/Link';
 import Carousel from '../../shared/components/Caurosel';
-import { Item, List } from '../models/pageEntry';
 import './HeroStandard3x1.css';
 
 class HeroStandard3x1 extends React.PureComponent<List> {

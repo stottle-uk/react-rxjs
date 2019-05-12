@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { Dictionary, Entry, List, PageTemplateData } from '../models/pageEntry';
+import {
+  Dictionary,
+  Entry,
+  List,
+  PageTemplateData
+} from '../../pageData/models/pageEntry';
 import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 

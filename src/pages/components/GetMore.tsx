@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paging } from '../models/pageEntry';
+import { Paging } from '../../pageData/models/pageEntry';
 import { GetMoreConsumer } from './GetMoreContext';
 
 export interface GetMoreProps extends React.HTMLProps<HTMLSpanElement> {

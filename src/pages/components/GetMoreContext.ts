@@ -1,6 +1,6 @@
 import { createContext } from 'react';
-import { Paging } from '../models/pageEntry';
-import { listsService } from '../pageDataServices';
+import { Paging } from '../../pageData/models/pageEntry';
+import { listsService } from '../../pageData/pageDataServices';
 
 interface GetMoreContext {
   getMore: (page: Paging) => void;

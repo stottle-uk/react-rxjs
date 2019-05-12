@@ -1,7 +1,7 @@
 import React from 'react';
+import { Item, List } from '../../pageData/models/pageEntry';
 import Link from '../../router/Link';
 import GetMore from '../components/GetMore';
-import { Item, List } from '../models/pageEntry';
 import './P2TemplateEntry.css';
 
 class P2PageEntry extends React.PureComponent<List> {

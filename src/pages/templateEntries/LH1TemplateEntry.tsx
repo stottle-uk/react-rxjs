@@ -1,5 +1,5 @@
 import React from 'react';
-import { Observable, of, Subject } from 'rxjs';
+import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
 import './P2TemplateEntry.css';
@@ -15,7 +15,13 @@ class LH1TemplateEntry extends React.Component<List, State> {
   };
 
   componentDidMount(): void {
-    new Observable<string>(observer => {
+    const promise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise value');
+      }, 1000);
+    });
+
+    const observable$ = new Observable<string>(observer => {
       let count = 0;
       setInterval(() => {
         observer.next(`Value ${count}`);
@@ -29,7 +35,9 @@ class LH1TemplateEntry extends React.Component<List, State> {
         }
         count++;
       }, 500);
-    })
+    });
+
+    merge(observable$, promise)
       .pipe(
         catchError(error => of(error)),
         tap(message =>

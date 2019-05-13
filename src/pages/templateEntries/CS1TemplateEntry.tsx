@@ -17,6 +17,7 @@ import {
   retryWhen,
   scan,
   switchMap,
+  take,
   tap
 } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
@@ -28,7 +29,7 @@ type mapFn = <T, TOut>(
 
 interface State {
   message: {
-    [exha: string]: string;
+    [key: string]: string;
   };
   interval: number;
   retryWait: (retryCount: number) => number;
@@ -37,26 +38,30 @@ interface State {
 class CS1TemplateEntry extends React.Component<List, State> {
   state: State = {
     message: {
-      switchMap: 'not started'
+      switchMap: 'switchMap',
+      mergeMap: 'mergeMap',
+      concatMap: 'concatMap',
+      exhaustMap: 'exhaustMap'
     },
     interval: 3000,
     retryWait: count => 1000 * count
   };
 
   componentDidMount(): void {
-    this.startInterval(switchMap, 'switchMap').subscribe();
-    this.startInterval(mergeMap, 'mergeMap').subscribe();
-    this.startInterval(concatMap, 'concatMap').subscribe();
-    this.startInterval(exhaustMap, 'exhaustMap').subscribe();
+    this.startInterval(switchMap, switchMap.name).subscribe();
+    this.startInterval(mergeMap, mergeMap.name).subscribe();
+    this.startInterval(concatMap, concatMap.name).subscribe();
+    this.startInterval(exhaustMap, exhaustMap.name).subscribe();
   }
 
   private startInterval(mapFn: mapFn, key: string): Observable<string> {
     return interval(this.state.interval).pipe(
-      tap(count => this.setMessage(key, `Getting ${count}`)),
+      take(10),
+      tap(count => this.log(key, `Getting ${count}`)),
       mapFn(url =>
         this.getHttpData(url, key).pipe(catchError(error => of(`${error}`)))
       ),
-      tap(response => this.setMessage(key, response))
+      tap(response => this.log(key, response))
     );
   }
 
@@ -64,10 +69,9 @@ class CS1TemplateEntry extends React.Component<List, State> {
     return this.getDataFromSource(url).pipe(
       retryWhen(errors =>
         errors.pipe(
-          tap(error => this.setMessage(key, `--- reponse: ${url} ${error}`)),
           scan(errorCount => ++errorCount, 0),
           tap(retryCount =>
-            this.setMessage(key, `--- retry: ${url} retry count ${retryCount}`)
+            this.log(key, `--- retry: ${url} retry count ${retryCount}`)
           ),
           delayWhen(retryCount =>
             retryCount < 4
@@ -79,10 +83,12 @@ class CS1TemplateEntry extends React.Component<List, State> {
     );
   }
 
-  private setMessage(key: string, message: string): void {
+  private log(key: string, message: string): void {
     this.setState({
-      ...this.state.message,
-      message: { [key]: `${this.state.message[key]}\n${key}: ${message}` }
+      message: {
+        ...this.state.message,
+        [key]: `${this.state.message[key]}\n${message}`
+      }
     });
   }
 
@@ -97,8 +103,22 @@ class CS1TemplateEntry extends React.Component<List, State> {
 
   render() {
     return (
-      <div>
-        <pre>{this.state.message.switchMap}</pre>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}
+      >
+        {Object.values(this.state.message).map((val, i) => (
+          <pre
+            key={i}
+            style={{
+              width: '25%'
+            }}
+          >
+            {val}
+          </pre>
+        ))}
       </div>
     );
   }

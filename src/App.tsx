@@ -31,6 +31,9 @@ class App extends Component<AppProps, AppState> {
         <Link to={'/'}>Home</Link>
         <span> - </span>
         <Link to={'/filmes-comedia/g'}>Category</Link>
+        <span> - </span>
+        <Link to={'/filmes-marvel'}>Marvel</Link>
+
         <hr />
       </div>
     );

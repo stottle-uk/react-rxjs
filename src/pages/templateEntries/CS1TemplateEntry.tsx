@@ -1,9 +1,11 @@
 import React from 'react';
 import {
   interval,
+  merge,
   Observable,
   of,
   OperatorFunction,
+  Subject,
   throwError,
   timer
 } from 'rxjs';
@@ -18,6 +20,7 @@ import {
   scan,
   switchMap,
   take,
+  takeUntil,
   tap
 } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
@@ -36,6 +39,7 @@ interface State {
 }
 
 class CS1TemplateEntry extends React.Component<List, State> {
+  destory$ = new Subject();
   state: State = {
     message: {
       switchMap: 'switchMap',
@@ -47,11 +51,20 @@ class CS1TemplateEntry extends React.Component<List, State> {
     retryWait: count => 1000 * count
   };
 
-  componentDidMount(): void {
-    this.startInterval(switchMap, switchMap.name).subscribe();
-    this.startInterval(mergeMap, mergeMap.name).subscribe();
-    this.startInterval(concatMap, concatMap.name).subscribe();
-    this.startInterval(exhaustMap, exhaustMap.name).subscribe();
+  componentWillUnmount(): void {
+    this.destory$.next();
+    this.destory$.complete();
+  }
+
+  startTimers(): void {
+    merge(
+      this.startInterval(switchMap, switchMap.name),
+      this.startInterval(mergeMap, mergeMap.name),
+      this.startInterval(concatMap, concatMap.name),
+      this.startInterval(exhaustMap, exhaustMap.name)
+    )
+      .pipe(takeUntil(this.destory$))
+      .subscribe();
   }
 
   private startInterval(mapFn: mapFn, key: string): Observable<string> {
@@ -66,12 +79,12 @@ class CS1TemplateEntry extends React.Component<List, State> {
   }
 
   private getHttpData(url: number, key: string): Observable<string> {
-    return this.getDataFromSource(url).pipe(
+    return getDataFromSource(url).pipe(
       retryWhen(errors =>
         errors.pipe(
           scan(errorCount => ++errorCount, 0),
           tap(retryCount =>
-            this.log(key, `--- retry: ${url} retry count ${retryCount}`)
+            this.log(key, `-- retry: ${url} retry count ${retryCount}`)
           ),
           delayWhen(retryCount =>
             retryCount < 4
@@ -92,19 +105,11 @@ class CS1TemplateEntry extends React.Component<List, State> {
     });
   }
 
-  private getDataFromSource(url: number): Observable<string> {
-    console.log(url);
-
-    if (!(url % 3)) {
-      return of(`Good http ${url}`).pipe(delay(1000));
-    }
-    return throwError(`Error http ${url}`).pipe(delay(3000));
-  }
-
   render() {
     return (
       <div>
         <h1>Transformation Map Operators</h1>
+        <button onClick={this.startTimers.bind(this)}>start</button>
         <div
           style={{
             display: 'flex',
@@ -128,3 +133,10 @@ class CS1TemplateEntry extends React.Component<List, State> {
 }
 
 export default CS1TemplateEntry;
+
+function getDataFromSource(url: number): Observable<string> {
+  if (url % 3) {
+    return throwError(`Error http ${url}`).pipe(delay(3000));
+  }
+  return of(`Good http ${url}`).pipe(delay(1000));
+}

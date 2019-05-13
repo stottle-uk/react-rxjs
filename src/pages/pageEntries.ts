@@ -7,6 +7,7 @@ import {
 import CS1TemplateEntry from './templateEntries/CS1TemplateEntry';
 import CS5TemplateEntry from './templateEntries/CS5TemplateEntry';
 import HeroStandard3x1 from './templateEntries/HeroStandard3x1';
+import LH1TemplateEntry from './templateEntries/LH1TemplateEntry';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
 import HomePage from './templates/HomePage';
 import OtherPage from './templates/OtherPage';
@@ -33,5 +34,6 @@ export const pageTemplateEntries: Dictionary<ComponentType<List>> = {
   '2:3 Poster (Block Hero)': P2PageEntry,
   D6: P2PageEntry,
   CS5: CS5TemplateEntry,
-  CS1: CS1TemplateEntry
+  CS1: CS1TemplateEntry,
+  LH1: LH1TemplateEntry
 };

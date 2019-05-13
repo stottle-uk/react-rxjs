@@ -103,22 +103,25 @@ class CS1TemplateEntry extends React.Component<List, State> {
 
   render() {
     return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-      >
-        {Object.values(this.state.message).map((val, i) => (
-          <pre
-            key={i}
-            style={{
-              width: '25%'
-            }}
-          >
-            {val}
-          </pre>
-        ))}
+      <div>
+        <h1>Transformation Map Operators</h1>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
+          {Object.values(this.state.message).map((val, i) => (
+            <pre
+              key={i}
+              style={{
+                width: '25%'
+              }}
+            >
+              {val}
+            </pre>
+          ))}
+        </div>
       </div>
     );
   }

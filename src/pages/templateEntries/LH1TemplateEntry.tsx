@@ -1,6 +1,6 @@
 import React from 'react';
-import { interval, merge, of, Subject } from 'rxjs';
-import { catchError, finalize, map, takeWhile, tap } from 'rxjs/operators';
+import { combineLatest, interval, Subject } from 'rxjs';
+import { finalize, map, takeWhile, tap } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
 import './P2TemplateEntry.css';
 
@@ -26,9 +26,10 @@ class LH1TemplateEntry extends React.Component<List, State> {
       map(val => `Value ${val}`)
     );
 
-    merge(observable$, promise)
+    combineLatest(observable$, promise)
       .pipe(
-        catchError(error => of(error)),
+        // catchError(error => of(error)),
+        map(([obs, prom]) => `${obs} ${prom}`),
         tap(message =>
           this.setState({
             message: [...this.state.message, message]

@@ -1,6 +1,6 @@
 import React from 'react';
-import { merge, Observable, of, Subject } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { interval, merge, of, Subject } from 'rxjs';
+import { catchError, finalize, map, takeWhile, tap } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
 import './P2TemplateEntry.css';
 
@@ -21,21 +21,10 @@ class LH1TemplateEntry extends React.Component<List, State> {
       }, 1000);
     });
 
-    const observable$ = new Observable<string>(observer => {
-      let count = 0;
-      setInterval(() => {
-        observer.next(`Value ${count}`);
-
-        if (count === 3) {
-          // observer.error('error');
-        }
-
-        if (count === 4) {
-          observer.complete();
-        }
-        count++;
-      }, 500);
-    });
+    const observable$ = interval(500).pipe(
+      takeWhile(val => val !== 6),
+      map(val => `Value ${val}`)
+    );
 
     merge(observable$, promise)
       .pipe(

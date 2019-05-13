@@ -1,6 +1,6 @@
 import React from 'react';
-import { combineLatest, interval, Subject } from 'rxjs';
-import { finalize, map, takeWhile, tap } from 'rxjs/operators';
+import { interval, merge, Subject } from 'rxjs';
+import { debounceTime, finalize, map, takeWhile, tap } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
 import './P2TemplateEntry.css';
 
@@ -9,27 +9,28 @@ interface State {
 }
 
 class LH1TemplateEntry extends React.Component<List, State> {
+  input$ = new Subject<string>();
   destory$ = new Subject();
   state: State = {
     message: ['Not Started']
   };
 
   componentDidMount(): void {
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<string>((resolve, reject) => {
       setTimeout(() => {
         resolve('promise value');
       }, 1000);
     });
 
-    const observable$ = interval(500).pipe(
-      takeWhile(val => val !== 6),
+    const observable$ = interval(2000).pipe(
+      takeWhile(val => val !== 50),
       map(val => `Value ${val}`)
     );
 
-    combineLatest(observable$, promise)
+    merge(observable$, promise, this.input$.pipe(debounceTime(200)))
       .pipe(
         // catchError(error => of(error)),
-        map(([obs, prom]) => `${obs} ${prom}`),
+        // map(vals => vals.reduce((prev, curr) => `${prev} ${curr}`, '')),
         tap(message =>
           this.setState({
             message: [...this.state.message, message]
@@ -49,9 +50,14 @@ class LH1TemplateEntry extends React.Component<List, State> {
     this.destory$.complete();
   }
 
+  private onInput(e: React.ChangeEvent<HTMLInputElement>) {
+    this.input$.next(e.target.value);
+  }
+
   render() {
     return (
       <div>
+        <input type="text" onChange={this.onInput.bind(this)} />
         {this.state.message.map((m, i) => (
           <div key={i}>{m}</div>
         ))}

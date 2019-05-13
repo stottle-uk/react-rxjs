@@ -58,7 +58,7 @@ export class ListsService {
       map(paging => paging.next),
       filter(next => !!next),
       distinctUntilChanged(),
-      map(paging => `${paging}`),
+      map(next => `${next}`),
       switchMap(nextUrl => this.httpService.get<List>(nextUrl))
     );
   }

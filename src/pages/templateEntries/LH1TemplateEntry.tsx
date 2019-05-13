@@ -29,23 +29,22 @@ class LH1TemplateEntry extends React.Component<List, State> {
 
     const mapObservable$ = of('hello');
 
-    merge(observable$, promise, this.input$)
-      .pipe(
-        // catchError(error => of(error)),
-        // map(vals => vals.reduce((prev, curr) => `${prev} ${curr}`, '')),
-        switchMap(val => mapObservable$.pipe(map(map => `${val} ${map}`))),
-        tap(message =>
-          this.setState({
-            message: [...this.state.message, message]
-          })
-        ),
-        finalize(() =>
-          this.setState({
-            message: [...this.state.message, 'the end']
-          })
-        )
+    merge(observable$, promise, this.input$).pipe(
+      // catchError(error => of(error)),
+      // map(vals => vals.reduce((prev, curr) => `${prev} ${curr}`, '')),
+      switchMap(val => mapObservable$.pipe(map(map => `${val} ${map}`))),
+      tap(message =>
+        this.setState({
+          message: [...this.state.message, message]
+        })
+      ),
+      finalize(() =>
+        this.setState({
+          message: [...this.state.message, 'the end']
+        })
       )
-      .subscribe();
+    );
+    // .subscribe();
   }
 
   componentWillUnmount(): void {

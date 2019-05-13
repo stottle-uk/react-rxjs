@@ -6,7 +6,7 @@ import {
 } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { BrowserHistory } from '../../router/services/BrowserHistory';
-import { List, PageEntry, PageTemplateData, Paging } from '../models/pageEntry';
+import { List, PageEntry, PageTemplateData } from '../models/pageEntry';
 import { ListsService } from './ListsService';
 import { PagesService } from './PagesService';
 
@@ -45,10 +45,6 @@ export class PageDataService {
     private pages: PagesService,
     private lists: ListsService
   ) {}
-
-  getMoreListItems(paging: Paging): void {
-    this.lists.getMore(paging);
-  }
 
   private setLoadingStatus<T>(loading: boolean): OperatorFunction<T, T> {
     return source => source.pipe(tap(() => this.innerLoading$.next(loading)));

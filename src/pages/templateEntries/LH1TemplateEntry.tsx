@@ -1,6 +1,6 @@
 import React from 'react';
 import { interval, merge, Subject } from 'rxjs';
-import { debounceTime, finalize, map, takeWhile, tap } from 'rxjs/operators';
+import { bufferCount, finalize, map, takeWhile, tap } from 'rxjs/operators';
 import { List } from '../../pageData/models/pageEntry';
 import './P2TemplateEntry.css';
 
@@ -22,15 +22,16 @@ class LH1TemplateEntry extends React.Component<List, State> {
       }, 1000);
     });
 
-    const observable$ = interval(2000).pipe(
+    const observable$ = interval(500).pipe(
       takeWhile(val => val !== 50),
       map(val => `Value ${val}`)
     );
 
-    merge(observable$, promise, this.input$.pipe(debounceTime(200)))
+    merge(observable$, promise, this.input$)
       .pipe(
+        bufferCount(5),
         // catchError(error => of(error)),
-        // map(vals => vals.reduce((prev, curr) => `${prev} ${curr}`, '')),
+        map(vals => vals.reduce((prev, curr) => `${prev} ${curr}`, '')),
         tap(message =>
           this.setState({
             message: [...this.state.message, message]

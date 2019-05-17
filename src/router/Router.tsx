@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Subject } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { historyContext, RouterOutletProvider } from './RouterContext';
 import { BrowserHistory } from './services/BrowserHistory';
 import { BrowserRouter } from './services/BrowserRouter';
@@ -31,14 +30,10 @@ interface HistoryOutletState<T> {
 const HistoryOutlet = <T extends {}>(props: HistoryOutletProps<T>) => {
   const [route, setRoute] = useState<HistoryOutletState<T>>();
 
-  useEffect(() => {
-    const destroy$ = new Subject();
-    const { history, router } = props;
-
-    history.activatedPath$
+  const routeListener = () =>
+    props.history.activatedPath$
       .pipe(
-        takeUntil(destroy$),
-        map(path => router.matchRoute(path)),
+        map(path => props.router.matchRoute(path)),
         map(route => ({
           element: route.template
         })),
@@ -46,11 +41,12 @@ const HistoryOutlet = <T extends {}>(props: HistoryOutletProps<T>) => {
       )
       .subscribe();
 
-    return () => {
-      destroy$.next();
-      destroy$.complete();
-    };
-  }, []);
+  const routerListenerEffect = () => {
+    const subscription = routeListener();
+    return () => subscription.unsubscribe();
+  };
+
+  useEffect(routerListenerEffect, []);
 
   return route ? (
     <RouterOutletProvider children={props.children} value={route.element} />

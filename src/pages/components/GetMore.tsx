@@ -1,24 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Paging } from '../../pageData/models/pageEntry';
-import { GetMoreConsumer } from './GetMoreContext';
+import { getMoreContext } from './GetMoreContext';
 
 export interface GetMoreProps extends React.HTMLProps<HTMLSpanElement> {
-  className: string;
   page: Paging;
 }
 
-class GetMore extends React.PureComponent<GetMoreProps> {
-  render() {
-    const { page, ...rest } = this.props;
-    return (
-      <GetMoreConsumer>
-        {({ getMore }) =>
-          !!page &&
-          page.next && <span {...rest} onClick={() => getMore(page)} />
-        }
-      </GetMoreConsumer>
-    );
-  }
-}
+const GetMore = (props: GetMoreProps) => {
+  const { page, ...rest } = props;
+  const { getMore } = useContext(getMoreContext);
+  return <span {...rest} onClick={() => getMore(page)} />;
+};
 
 export default GetMore;

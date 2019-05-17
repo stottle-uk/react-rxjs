@@ -6,9 +6,9 @@ interface GetMoreContext {
   getMore: (page: Paging) => void;
 }
 
-const context = createContext<GetMoreContext>({
+export const getMoreContext = createContext<GetMoreContext>({
   getMore: listsService.getMore.bind(listsService)
 });
 
-export const GetMoreProvider = context.Provider;
-export const GetMoreConsumer = context.Consumer;
+export const GetMoreProvider = getMoreContext.Provider;
+export const GetMoreConsumer = getMoreContext.Consumer;

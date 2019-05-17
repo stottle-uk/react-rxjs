@@ -8,7 +8,7 @@ import { PageTemplateData } from './pageData/models/pageEntry';
 import { configService } from './pageData/pageDataServices';
 import { pageEntries } from './pages/pageEntries';
 import NotFound from './pages/templates/NotFound';
-import { browserHistory, router } from './router/RouterContext';
+import { router } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';
 
@@ -21,7 +21,6 @@ configService
     map(config => config.sitemap),
     map(sitemap => mapSitemapToRoute(sitemap)),
     tap(routes => router.addRoutes(routes)),
-    tap(() => browserHistory.refresh()),
     tap(() => renderDom(App))
   )
   .subscribe();

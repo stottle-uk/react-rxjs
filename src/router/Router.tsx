@@ -14,8 +14,8 @@ export const Router = (props: RouterProps) => {
   const { history } = useContext(HistoryContext);
   const [route, setRoute] = useState<RouterState>();
 
-  const routeListener = () =>
-    history.activatedPath$
+  const routerListenerEffect = () => {
+    const subscription = history.activatedPath$
       .pipe(
         map(path => ({
           path
@@ -23,9 +23,6 @@ export const Router = (props: RouterProps) => {
         tap(state => setRoute(state))
       )
       .subscribe();
-
-  const routerListenerEffect = () => {
-    const subscription = routeListener();
     return () => subscription.unsubscribe();
   };
 

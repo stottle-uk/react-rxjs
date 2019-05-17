@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { historyContext } from './RouterContext';
+import { HistoryContext } from './RouterContext';
 
 export interface LinkProps {
   to: string;
@@ -7,7 +7,7 @@ export interface LinkProps {
 }
 
 const Link = (props: LinkProps) => {
-  const { history } = useContext(historyContext);
+  const { history } = useContext(HistoryContext);
   const { to, ...rest } = props;
 
   const handleClick = (

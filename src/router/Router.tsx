@@ -1,41 +1,24 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { map, tap } from 'rxjs/operators';
-import { historyContext, RouterOutletProvider } from './RouterContext';
-import { BrowserHistory } from './services/BrowserHistory';
-import { BrowserRouter } from './services/BrowserRouter';
+import { ActivatedPathContext, HistoryContext } from './RouterContext';
 
-interface RouterProps<T> {
-  router: BrowserRouter<T>;
+interface RouterProps {
   children: React.ReactNode;
 }
 
-export const Router = <T extends {}>(props: RouterProps<T>) => {
-  const { history } = useContext(historyContext);
-  const { router, children } = props;
-  return (
-    <HistoryOutlet router={router} history={history} children={children} />
-  );
-};
-
-export default Router;
-
-interface HistoryOutletProps<T> extends RouterProps<T> {
-  history: BrowserHistory;
+interface RouterState {
+  path: string;
 }
 
-interface HistoryOutletState<T> {
-  element: React.ComponentType<T>;
-}
-
-const HistoryOutlet = <T extends {}>(props: HistoryOutletProps<T>) => {
-  const [route, setRoute] = useState<HistoryOutletState<T>>();
+export const Router = (props: RouterProps) => {
+  const { history } = useContext(HistoryContext);
+  const [route, setRoute] = useState<RouterState>();
 
   const routeListener = () =>
-    props.history.activatedPath$
+    history.activatedPath$
       .pipe(
-        map(path => props.router.matchRoute(path)),
-        map(route => ({
-          element: route.template
+        map(path => ({
+          path
         })),
         tap(state => setRoute(state))
       )
@@ -49,8 +32,10 @@ const HistoryOutlet = <T extends {}>(props: HistoryOutletProps<T>) => {
   useEffect(routerListenerEffect, []);
 
   return route ? (
-    <RouterOutletProvider children={props.children} value={route.element} />
+    <ActivatedPathContext.Provider children={props.children} value={route} />
   ) : (
     <span />
   );
 };
+
+export default Router;

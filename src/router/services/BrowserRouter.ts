@@ -1,21 +1,16 @@
-import { RouterConfig, RouterConfigRoute } from '../types/router';
+import { RouterConfigRoute } from '../types/router';
 import { RouteMatcher } from './RouteMatcher';
 
 export class BrowserRouter<T> {
-  constructor(
-    private routerConfig: RouterConfig<T>,
-    private routerMatcher: RouteMatcher<T>
-  ) {}
+  private routerConfig: RouterConfigRoute<T>[] = [];
+
+  constructor(private routerMatcher: RouteMatcher<T>) {}
 
   addRoutes(routes: RouterConfigRoute<T>[]): void {
-    this.routerConfig.routes = [...this.routerConfig.routes, ...routes];
+    this.routerConfig = [...this.routerConfig, ...routes];
   }
 
   matchRoute(path: string): RouterConfigRoute<T> {
-    return this.routerMatcher.matchRoute(
-      path,
-      this.routerConfig.routes,
-      this.routerConfig.defaultRoute
-    );
+    return this.routerMatcher.matchRoute(path, this.routerConfig);
   }
 }

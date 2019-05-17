@@ -1,26 +1,37 @@
 import React from 'react';
 import { BrowserHistory } from './services/BrowserHistory';
+import { BrowserRouter } from './services/BrowserRouter';
+import { RouteMatcher } from './services/RouteMatcher';
 
-export interface RouterOutletContext {
-  element: React.ComponentType<any>;
+// Activated Path
+export interface ActivatedPathContext {
+  path: string;
 }
 
-export const routerOutletContext = React.createContext<
-  React.ComponentType<any>
->(() => <span />);
+export const ActivatedPathContext = React.createContext<ActivatedPathContext>({
+  path: ''
+});
 
-export const RouterOutletProvider = routerOutletContext.Provider;
-export const RouterOutletConsumer = routerOutletContext.Consumer;
-
+// History
 export interface HistoryContext {
   history: BrowserHistory;
 }
 
 export const browserHistory = new BrowserHistory();
 
-export const historyContext = React.createContext<HistoryContext>({
+export const HistoryContext = React.createContext<HistoryContext>({
   history: browserHistory
 });
 
-export const HistoryProvider = historyContext.Provider;
-export const HistoryConsumer = historyContext.Consumer;
+// Router
+export const routeMatcher = new RouteMatcher<any>();
+
+export interface RouterContext {
+  router: BrowserRouter<any>;
+}
+
+export const router = new BrowserRouter<any>(routeMatcher);
+
+export const RouterContext = React.createContext<RouterContext>({
+  router
+});

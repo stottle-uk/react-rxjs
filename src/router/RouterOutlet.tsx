@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
-import { routerOutletContext } from './RouterContext';
+import { ActivatedPathContext, RouterContext } from './RouterContext';
 
 const RouterOutlet = <T extends {}>(props: T) => {
-  const Element = useContext<React.ComponentType<T>>(routerOutletContext);
-  return <Element {...props} />;
+  const { router } = useContext(RouterContext);
+  const { path } = useContext(ActivatedPathContext);
+  const route = router.matchRoute(path);
+  return <route.template {...props} />;
 };
 
 export default RouterOutlet;

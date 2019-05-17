@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import { PageTemplateData } from './pageData/models/pageEntry';
-import { router } from './pageData/pageDataServices';
 import Page from './pages/Page';
 import Link from './router/Link';
 import Router from './router/Router';
@@ -17,7 +16,7 @@ class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <Router router={router}>
+        <Router>
           {this.renderHeader()}
           <Page />
         </Router>

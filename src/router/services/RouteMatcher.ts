@@ -3,10 +3,9 @@ import { RouterConfigRoute } from '../types/router';
 export class RouteMatcher<T> {
   matchRoute(
     path: string,
-    routes: RouterConfigRoute<T>[],
-    deafultRoute: RouterConfigRoute<T>
+    routes: RouterConfigRoute<T>[]
   ): RouterConfigRoute<T> {
-    const route = routes.find(r => this.findRoute(path, r)) || deafultRoute;
+    const route = routes.filter(r => this.findRoute(path, r))[0];
 
     if (path.startsWith('/filme/') || path.startsWith('/playlist/')) {
       return {

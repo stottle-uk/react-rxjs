@@ -5,9 +5,9 @@ export interface RouterOutletContext {
   element: React.ComponentType<any>;
 }
 
-const routerOutletContext = React.createContext<RouterOutletContext>({
-  element: () => <span />
-});
+export const routerOutletContext = React.createContext<
+  React.ComponentType<any>
+>(() => <span />);
 
 export const RouterOutletProvider = routerOutletContext.Provider;
 export const RouterOutletConsumer = routerOutletContext.Consumer;
@@ -18,7 +18,7 @@ export interface HistoryContext {
 
 export const browserHistory = new BrowserHistory();
 
-const historyContext = React.createContext<HistoryContext>({
+export const historyContext = React.createContext<HistoryContext>({
   history: browserHistory
 });
 

@@ -1,33 +1,23 @@
-import React from 'react';
-import { HistoryConsumer } from './RouterContext';
+import React, { useContext } from 'react';
+import { historyContext } from './RouterContext';
 
 export interface LinkProps {
   to: string;
+  children: React.ReactNode;
 }
 
-class Link extends React.PureComponent<LinkProps> {
-  handleClick(
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    go: (path: string) => void
-  ): void {
+const Link = (props: LinkProps) => {
+  const { history } = useContext(historyContext);
+  const { to, ...rest } = props;
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ): void => {
     event.preventDefault();
-    go(event.currentTarget.pathname);
-  }
+    history.go(event.currentTarget.pathname);
+  };
 
-  render() {
-    const { to, ...rest } = this.props;
-    return (
-      <HistoryConsumer>
-        {({ history }) => (
-          <a
-            {...rest}
-            onClick={event => this.handleClick(event, history.go.bind(history))}
-            href={to}
-          />
-        )}
-      </HistoryConsumer>
-    );
-  }
-}
+  return <a {...rest} onClick={handleClick} href={to} />;
+};
 
 export default Link;

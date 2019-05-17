@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
-import { HistoryConsumer, RouterOutletProvider } from './RouterContext';
+import { map, tap } from 'rxjs/operators';
+import { historyContext, RouterOutletProvider } from './RouterContext';
 import { BrowserHistory } from './services/BrowserHistory';
 import { BrowserRouter } from './services/BrowserRouter';
 
@@ -11,15 +11,10 @@ interface RouterProps<T> {
 }
 
 export const Router = <T extends {}>(props: RouterProps<T>) => {
+  const { history } = useContext(historyContext);
   const { router, children } = props;
   return (
-    <HistoryConsumer>
-      {({ history }) => (
-        <HistoryOutlet router={router} history={history}>
-          {children}
-        </HistoryOutlet>
-      )}
-    </HistoryConsumer>
+    <HistoryOutlet router={router} history={history} children={children} />
   );
 };
 
@@ -33,35 +28,32 @@ interface HistoryOutletState<T> {
   element: React.ComponentType<T>;
 }
 
-class HistoryOutlet<T> extends Component<
-  HistoryOutletProps<T>,
-  HistoryOutletState<T>
-> {
-  destory$ = new Subject();
+const HistoryOutlet = <T extends {}>(props: HistoryOutletProps<T>) => {
+  const [element, setElement] = useState<HistoryOutletState<T>>();
 
-  componentDidMount(): void {
-    const { history, router } = this.props;
+  useEffect(() => {
+    const destory$ = new Subject();
+    const { history, router } = props;
 
     history.activatedPath$
       .pipe(
-        takeUntil(this.destory$),
         map(path => router.matchRoute(path)),
         map(route => ({
           element: route.template
         })),
-        tap(state => this.setState(state))
+        tap(state => setElement(state))
       )
       .subscribe();
-  }
 
-  componentWillUnmount(): void {
-    this.destory$.next();
-    this.destory$.complete();
-  }
+    return () => {
+      destory$.next();
+      destory$.complete();
+    };
+  }, []);
 
-  render() {
-    return (
-      <RouterOutletProvider children={this.props.children} value={this.state} />
-    );
-  }
-}
+  return element ? (
+    <RouterOutletProvider children={props.children} value={element.element} />
+  ) : (
+    <span />
+  );
+};

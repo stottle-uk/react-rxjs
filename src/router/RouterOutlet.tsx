@@ -1,12 +1,9 @@
-import React from 'react';
-import { RouterOutletConsumer } from './RouterContext';
+import React, { useContext } from 'react';
+import { routerOutletContext } from './RouterContext';
 
 const RouterOutlet = <T extends {}>(props: T) => {
-  return (
-    <RouterOutletConsumer>
-      {context => <context.element {...props} />}
-    </RouterOutletConsumer>
-  );
+  const Element = useContext<React.ComponentType<T>>(routerOutletContext);
+  return <Element {...props} />;
 };
 
 export default RouterOutlet;

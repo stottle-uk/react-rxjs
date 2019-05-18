@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Paging } from '../../pageData/models/pageEntry';
-import { getMoreContext } from './GetMoreContext';
+import { PageDataContext } from '../../pageData/pageDataServices';
 
 export interface GetMoreProps extends React.HTMLProps<HTMLSpanElement> {
   page: Paging;
@@ -8,7 +8,7 @@ export interface GetMoreProps extends React.HTMLProps<HTMLSpanElement> {
 
 const GetMore = (props: GetMoreProps) => {
   const { page, ...rest } = props;
-  const { getMore } = useContext(getMoreContext);
+  const { getMore } = useContext(PageDataContext);
   return <span {...rest} onClick={() => getMore(page)} />;
 };
 

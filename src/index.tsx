@@ -12,7 +12,7 @@ import { router } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';
 
-renderDom(NotFound);
+renderDom(<NotFound />);
 
 configService
   .getConfig()
@@ -21,7 +21,7 @@ configService
     map(config => config.sitemap),
     map(sitemap => mapSitemapToRoute(sitemap)),
     tap(routes => router.addRoutes(routes)),
-    tap(() => renderDom(App))
+    tap(() => renderDom(<App />))
   )
   .subscribe();
 
@@ -35,8 +35,8 @@ function mapSitemapToRoute(
   }));
 }
 
-function renderDom(Element: React.ComponentType<any>): void {
-  ReactDOM.render(<Element />, document.getElementById('root'));
+function renderDom(element: React.FunctionComponentElement<any>): void {
+  ReactDOM.render(element, document.getElementById('root'));
 }
 
 // If you want your app to work offline and load faster, you can change

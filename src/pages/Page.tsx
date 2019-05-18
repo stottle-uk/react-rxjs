@@ -1,44 +1,26 @@
-import React, { Component } from 'react';
-import { Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import React, { useEffect, useState } from 'react';
+import { tap } from 'rxjs/operators';
 import { PageTemplateData } from '../pageData/models/pageEntry';
 import { pagesDataService } from '../pageData/pageDataServices';
-import RouterOutlet from '../router/RouterOutlet';
+import Router from '../router/Router';
 
-export interface PageProps {}
+export const Page = () => {
+  const [pageData, setPageData] = useState<PageTemplateData>();
 
-interface PageState {
-  pageData: PageTemplateData;
-}
-
-class Page extends Component<PageProps, PageState> {
-  destory$ = new Subject();
-
-  componentDidMount(): void {
-    pagesDataService.pageData$
-      .pipe(
-        takeUntil(this.destory$),
-        tap(pageData =>
-          this.setState({
-            pageData
-          })
-        )
-      )
+  const pageDataEffect = () => {
+    const subscription = pagesDataService.pageData$
+      .pipe(tap(pageData => setPageData(pageData)))
       .subscribe();
-  }
+    return () => subscription.unsubscribe();
+  };
 
-  componentWillUnmount(): void {
-    this.destory$.next();
-    this.destory$.complete();
-  }
+  useEffect(pageDataEffect, []);
 
-  render() {
-    return this.state && this.state.pageData && !this.state.pageData.loading ? (
-      <RouterOutlet {...this.state.pageData} />
-    ) : (
-      <div>loading!!!</div>
-    );
-  }
-}
+  return pageData && !pageData.loading ? (
+    <Router {...pageData} />
+  ) : (
+    <div>loading!!!</div>
+  );
+};
 
 export default Page;

@@ -1,11 +1,15 @@
 import React, { useContext } from 'react';
-import { ActivatedPathContext, RouterContext } from './RouterContext';
+import { RouterContext } from './RouterContext';
 
-const RouterOutlet = <T extends {}>(props: T) => {
-  const { router } = useContext(RouterContext);
-  const { path } = useContext(ActivatedPathContext);
-  const route = router.matchRoute(path);
-  return <route.template {...props} />;
+interface RouterOutletState<T> {
+  path: string;
+  pageData: T;
+}
+
+const RouterOutlet = <T extends {}>(props: RouterOutletState<T>) => {
+  const router = useContext(RouterContext);
+  const route = router.matchRoute(props.path);
+  return <route.template {...props.pageData} />;
 };
 
 export default RouterOutlet;

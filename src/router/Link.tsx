@@ -7,7 +7,7 @@ export interface LinkProps {
 }
 
 const Link = (props: LinkProps) => {
-  const { history } = useContext(HistoryContext);
+  const history = useContext(HistoryContext);
   const { to, ...rest } = props;
 
   const handleClick = (

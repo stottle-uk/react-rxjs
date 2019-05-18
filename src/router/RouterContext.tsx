@@ -7,30 +7,10 @@ export const browserHistory = new BrowserHistory();
 export const routeMatcher = new RouteMatcher<any>();
 export const router = new BrowserRouter<any>(routeMatcher);
 
-// Activated Path
-export interface ActivatedPathContext {
-  path: string;
-}
-
-export const ActivatedPathContext = React.createContext<ActivatedPathContext>({
-  path: ''
-});
-
 // History
-export interface HistoryContext {
-  history: BrowserHistory;
-}
-
-export const HistoryContext = React.createContext<HistoryContext>({
-  history: browserHistory
-});
+export const HistoryContext = React.createContext<BrowserHistory>(
+  browserHistory
+);
 
 // Router
-
-export interface RouterContext {
-  router: BrowserRouter<any>;
-}
-
-export const RouterContext = React.createContext<RouterContext>({
-  router
-});
+export const RouterContext = React.createContext<BrowserRouter<any>>(router);

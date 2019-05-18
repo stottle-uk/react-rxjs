@@ -3,7 +3,6 @@ import './App.css';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import Page from './pages/Page';
 import Link from './router/Link';
-import Router from './router/Router';
 
 export interface AppProps {}
 
@@ -16,10 +15,8 @@ class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <Router>
-          {this.renderHeader()}
-          <Page />
-        </Router>
+        {this.renderHeader()}
+        <Page />
       </div>
     );
   }

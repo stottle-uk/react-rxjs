@@ -3,13 +3,18 @@ import { RouterContext } from './RouterContext';
 
 interface RouterOutletState<T> {
   path: string;
-  pageData: T;
+  routeData: T;
+  children: React.ReactElement;
 }
 
-const RouterOutlet = <T extends {}>(props: RouterOutletState<T>) => {
+const RouterOutlet = <T extends {}>({
+  path,
+  routeData,
+  children
+}: RouterOutletState<T>) => {
   const router = useContext(RouterContext);
-  const route = router.matchRoute(props.path);
-  return <route.template {...props.pageData} />;
+  const route = router.matchRoute(path);
+  return route ? <route.template {...routeData} /> : children;
 };
 
 export default RouterOutlet;

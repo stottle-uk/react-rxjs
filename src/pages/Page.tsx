@@ -1,16 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { PageTemplateData } from '../pageData/models/pageEntry';
 import { PageDataContext } from '../pageData/pageDataServices';
 import Router from '../router/Router';
+import PageNotFound from './PageNotFound';
 
 export const Page = () => {
   const [pageData, setPageData] = useState<PageTemplateData>();
+
   const { pageData$ } = useContext(PageDataContext);
 
   const pageDataEffect = () => {
     const subscription = pageData$
-      .pipe(tap(pageData => setPageData(pageData)))
+      .pipe(
+        catchError(() =>
+          of({
+            pageEntry: {},
+            lists: {}
+          } as PageTemplateData)
+        ),
+        tap(pageData => setPageData(pageData))
+      )
       .subscribe();
     return () => subscription.unsubscribe();
   };
@@ -18,7 +29,9 @@ export const Page = () => {
   useEffect(pageDataEffect, []);
 
   return pageData && !pageData.loading ? (
-    <Router {...pageData} />
+    <Router routeData={pageData}>
+      <PageNotFound />
+    </Router>
   ) : (
     <div>loading!!!</div>
   );

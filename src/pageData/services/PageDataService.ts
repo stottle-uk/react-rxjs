@@ -2,9 +2,10 @@ import {
   BehaviorSubject,
   combineLatest,
   Observable,
-  OperatorFunction
+  OperatorFunction,
+  throwError
 } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { BrowserHistory } from '../../router/services/BrowserHistory';
 import { List, PageEntry, PageTemplateData } from '../models/pageEntry';
 import { ListsService } from './ListsService';
@@ -36,7 +37,8 @@ export class PageDataService {
         loading,
         pageEntry,
         lists
-      }))
+      })),
+      catchError(error => throwError(error).pipe(this.setLoadingStatus(false)))
     );
   }
 

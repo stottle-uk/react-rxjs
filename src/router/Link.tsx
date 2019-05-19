@@ -6,10 +6,8 @@ export interface LinkProps {
   children: React.ReactNode;
 }
 
-const Link = (props: LinkProps) => {
+const Link = ({ to, ...rest }: LinkProps) => {
   const history = useContext(HistoryContext);
-  const { to, ...rest } = props;
-
   const handleClick = (
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void => {

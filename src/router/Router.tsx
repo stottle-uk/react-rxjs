@@ -3,9 +3,17 @@ import { tap } from 'rxjs/operators';
 import { HistoryContext } from './RouterContext';
 import RouterOutlet from './RouterOutlet';
 
-export const Router = <T extends {}>(props: T) => {
+interface RouterProps<T> {
+  routeData: T;
+  children: React.ReactElement;
+}
+
+export const Router = <T extends {}>({
+  children,
+  routeData
+}: RouterProps<T>) => {
   const history = useContext(HistoryContext);
-  const [path, setPath] = useState<string>();
+  const [path, setPath] = useState<string>('');
 
   const routerListenerEffect = () => {
     const subscription = history.activatedPath$
@@ -16,7 +24,7 @@ export const Router = <T extends {}>(props: T) => {
 
   useEffect(routerListenerEffect, []);
 
-  return path ? <RouterOutlet pageData={props} path={path} /> : <span />;
+  return <RouterOutlet routeData={routeData} path={path} children={children} />;
 };
 
 export default Router;

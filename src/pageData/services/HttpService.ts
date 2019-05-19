@@ -1,4 +1,4 @@
-import { empty, Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ajax, AjaxError } from 'rxjs/ajax';
 import { catchError, delay } from 'rxjs/operators';
 import { baseApiUrl } from '../env';
@@ -16,6 +16,6 @@ export class HttpService {
 
   private handleError(error: AjaxError): Observable<any> {
     console.log(error);
-    return empty();
+    return throwError(error);
   }
 }

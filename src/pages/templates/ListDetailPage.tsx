@@ -8,7 +8,7 @@ import {
 import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 
-class OtherPage extends React.Component<PageTemplateData, any> {
+class ListDetailPage extends React.Component<PageTemplateData, any> {
   render() {
     const { pageEntry, lists } = this.props;
 
@@ -42,4 +42,4 @@ class OtherPage extends React.Component<PageTemplateData, any> {
   }
 }
 
-export default OtherPage;
+export default ListDetailPage;

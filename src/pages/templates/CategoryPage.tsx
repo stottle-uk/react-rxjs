@@ -8,7 +8,7 @@ import {
 import { pageTemplateEntries } from '../pageEntries';
 import NotFound from './NotFound';
 
-class HomePage extends Component<PageTemplateData, any> {
+class CategoryPage extends Component<PageTemplateData, any> {
   render() {
     const { pageEntry, lists } = this.props;
 
@@ -41,4 +41,4 @@ class HomePage extends Component<PageTemplateData, any> {
   }
 }
 
-export default HomePage;
+export default CategoryPage;

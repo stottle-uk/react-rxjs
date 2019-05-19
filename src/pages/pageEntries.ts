@@ -9,8 +9,8 @@ import CS5TemplateEntry from './templateEntries/CS5TemplateEntry';
 import HeroStandard3x1 from './templateEntries/HeroStandard3x1';
 import LH1TemplateEntry from './templateEntries/LH1TemplateEntry';
 import P2PageEntry from './templateEntries/P2TemplateEntry';
-import HomePage from './templates/HomePage';
-import OtherPage from './templates/OtherPage';
+import CategoryPage from './templates/CategoryPage';
+import ListDetailPage from './templates/ListDetailPage';
 
 const home = 'Home';
 const category = 'Category';
@@ -19,11 +19,11 @@ const listDetail = 'List Detail';
 const listDefailFeatured = 'List Detail Featured';
 
 export const pageEntries: Dictionary<ComponentType<PageTemplateData>> = {
-  [home]: HomePage,
-  [category]: HomePage,
-  [listDetail]: OtherPage,
-  [movieDetail]: OtherPage,
-  [listDefailFeatured]: OtherPage
+  [home]: CategoryPage,
+  [category]: CategoryPage,
+  [listDetail]: ListDetailPage,
+  [movieDetail]: ListDetailPage,
+  [listDefailFeatured]: ListDetailPage
 };
 
 export const pageTemplateEntries: Dictionary<ComponentType<List>> = {

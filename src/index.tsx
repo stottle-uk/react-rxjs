@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom';
 import { first, map, tap } from 'rxjs/operators';
 import App from './App';
 import './index.css';
+import SplashPage from './layout/components/SplashPage';
 import { Sitemap } from './pageData/models/config';
 import { PageTemplateData } from './pageData/models/pageEntry';
 import { configService } from './pageData/pageDataServices';
 import { pageEntries } from './pages/pageEntries';
-import NotFound from './pages/templates/NotFound';
 import { router } from './router/RouterContext';
 import { RouterConfigRoute } from './router/types/router';
 import * as serviceWorker from './serviceWorker';
 
-renderDom(<NotFound />);
+renderDom(<SplashPage />);
 
 configService
   .getConfig()

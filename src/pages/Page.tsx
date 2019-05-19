@@ -28,13 +28,26 @@ export const Page = () => {
 
   useEffect(pageDataEffect, []);
 
-  return pageData && !pageData.loading ? (
-    <Router routeData={pageData}>
-      <PageNotFound />
-    </Router>
+  return pageData ? (
+    <div>
+      <PageLoading {...pageData} />
+      <PageBody {...pageData} />
+    </div>
   ) : (
     <div>loading!!!</div>
   );
 };
 
 export default Page;
+
+const PageBody = (props: PageTemplateData) => {
+  return !props.loading ? (
+    <Router routeData={props}>
+      <PageNotFound />
+    </Router>
+  ) : null;
+};
+
+function PageLoading(pageData: PageTemplateData) {
+  return pageData.loading ? <div>loading!!!</div> : null;
+}

@@ -26,6 +26,7 @@ export class ListsService {
   private innerListQueue$ = new Subject<List>();
   private innerPaging$ = new Subject<Paging>();
   private innerCache$ = new BehaviorSubject<Dictionary<List>>({});
+  private innerLoading$ = new BehaviorSubject<boolean>(false);
 
   private get listNotInCache$(): Observable<List> {
     return this.innerCurrentList$.asObservable().pipe(
@@ -47,8 +48,12 @@ export class ListsService {
       bufferTime(200, null, 5),
       filter(lists => !!lists.length),
       map(lists => this.buildListUri(lists.map(l => l.id))),
+      this.setLoadingStatus(true),
       mergeMap(uri =>
-        this.httpService.get<List[]>(uri).pipe(switchMap(lists => from(lists)))
+        this.httpService.get<List[]>(uri).pipe(
+          this.setLoadingStatus(false),
+          switchMap(lists => from(lists))
+        )
       )
     );
   }
@@ -59,8 +64,15 @@ export class ListsService {
       filter(next => !!next),
       distinctUntilChanged(),
       map(next => `${next}`),
-      switchMap(nextUrl => this.httpService.get<List>(nextUrl))
+      this.setLoadingStatus(true),
+      switchMap(nextUrl =>
+        this.httpService.get<List>(nextUrl).pipe(this.setLoadingStatus(false))
+      )
     );
+  }
+
+  get loading$(): Observable<boolean> {
+    return this.innerLoading$.asObservable();
   }
 
   get lists$(): Observable<Dictionary<List>> {
@@ -89,6 +101,10 @@ export class ListsService {
 
   getMore(paging: Paging): void {
     this.innerPaging$.next(paging);
+  }
+
+  private setLoadingStatus<T>(loading: boolean): OperatorFunction<T, T> {
+    return source => source.pipe(tap(() => this.innerLoading$.next(loading)));
   }
 
   private concatListFromCache(): OperatorFunction<List, List> {

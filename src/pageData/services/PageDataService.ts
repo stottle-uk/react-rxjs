@@ -31,12 +31,14 @@ export class PageDataService {
     return combineLatest(
       this.currentPage$,
       this.lists.lists$,
-      this.loading$
+      this.loading$,
+      this.lists.loading$
     ).pipe(
-      map(([pageEntry, lists, loading]) => ({
+      map(([pageEntry, lists, loading, listsLoading]) => ({
         loading,
         pageEntry,
-        lists
+        lists,
+        listsLoading
       })),
       catchError(error => throwError(error).pipe(this.setLoadingStatus(false)))
     );

@@ -34,7 +34,7 @@ export const Page = () => {
       <PageBody {...pageData} />
     </div>
   ) : (
-    <div>loading!!!</div>
+    <Loading />
   );
 };
 
@@ -48,6 +48,10 @@ const PageBody = (props: PageTemplateData) => {
   ) : null;
 };
 
-function PageLoading(pageData: PageTemplateData) {
-  return pageData.loading ? <div>loading!!!</div> : null;
-}
+const PageLoading = (pageData: PageTemplateData) => {
+  return pageData.loading || pageData.listsLoading ? <Loading /> : null;
+};
+
+const Loading = () => {
+  return <div>loading!!!</div>;
+};

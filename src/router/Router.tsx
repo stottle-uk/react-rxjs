@@ -13,7 +13,7 @@ export const Router = <T extends {}>({
   routeData
 }: RouterProps<T>) => {
   const history = useContext(HistoryContext);
-  const [path, setPath] = useState<string>('');
+  const [path, setPath] = useState<string>();
 
   const routerListenerEffect = () => {
     const subscription = history.activatedPath$
@@ -24,7 +24,11 @@ export const Router = <T extends {}>({
 
   useEffect(routerListenerEffect, []);
 
-  return <RouterOutlet routeData={routeData} path={path} children={children} />;
+  return path ? (
+    <RouterOutlet routeData={routeData} path={path} children={children} />
+  ) : (
+    <span />
+  );
 };
 
 export default Router;
